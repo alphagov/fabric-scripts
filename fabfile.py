@@ -21,6 +21,11 @@ for host in hosts:
     env.roledefs['class-%s' % name.rstrip('-1234567890')].append(host)
 
 @task
+def do(command):
+    "Execute arbitrary commands"
+    run(command)
+
+@task
 def uptime():
     "Show uptime and load"
     run('uptime')
