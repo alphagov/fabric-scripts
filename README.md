@@ -1,6 +1,6 @@
 # GOV.UK Fabric Scripts
 
-[Fabric][http://fabfile.org] is a command-line tool for application deployment
+[Fabric](http://fabfile.org) is a command-line tool for application deployment
 and systems administration tasks. It allows the user to run commands across a
 server farm.
 
