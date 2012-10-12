@@ -26,6 +26,11 @@ def do(command):
     run(command)
 
 @task
+def sdo(command):
+    "Execute arbitrary commands with sudo"
+    sudo(command)
+
+@task
 def uptime():
     "Show uptime and load"
     run('uptime')
