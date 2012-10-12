@@ -15,6 +15,7 @@ with hide('running'):
 
 for host in hosts:
     name, vdc, org = host.rsplit('.', 3)
+    env.roledefs['all'].append(host)
     env.roledefs['org-%s' % org].append(host)
     env.roledefs['vdc-%s' % vdc].append(host)
     env.roledefs['class-%s' % name.rstrip('-1234567890')].append(host)
