@@ -72,6 +72,11 @@ def free():
     run('free')
 
 @task
+def disk():
+    """Show disk usage"""
+    run('df -kh')
+
+@task
 def updates():
     """Show package counts needing updates"""
     run("cat /var/lib/update-notifier/updates-available")
