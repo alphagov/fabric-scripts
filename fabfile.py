@@ -47,6 +47,11 @@ def list():
     puts('\n'.join(sorted(hosts)))
 
 @task
+def list_roles():
+    for role in sorted(env.roledefs.keys()):
+        print "%s %s" % (role, len(env.roledefs[role]))
+
+@task
 def do(command):
     """Execute arbitrary commands"""
     run(command)
