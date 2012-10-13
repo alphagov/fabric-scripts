@@ -40,6 +40,11 @@ def help(name):
     puts(textwrap.dedent(task.__doc__).strip())
 
 @task
+def list():
+    """List known hosts"""
+    puts('\n'.join(sorted(hosts)))
+
+@task
 def do(command):
     "Execute arbitrary commands"
     run(command)
