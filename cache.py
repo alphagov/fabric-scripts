@@ -16,7 +16,7 @@ def restart():
     """
     sdo('/etc/init.d/varnish restart')
 
-@task
+@task(default=True)
 @roles('class-cache')
 def stats():
     "Show details about varnish performance"
