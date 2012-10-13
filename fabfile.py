@@ -49,6 +49,7 @@ def list():
 
 @task
 def list_roles():
+    """List available roles"""
     for role in sorted(env.roledefs.keys()):
         print "%s %s" % (role, len(env.roledefs[role]))
 
