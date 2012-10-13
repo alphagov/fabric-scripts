@@ -3,13 +3,13 @@ from fabric.api import *
 import util
 
 SEARCHABLE_APPS = {
-    'calendars':             ('frontend', 'panopticon:register'),
-    'licencefinder':         ('frontend', 'panopticon:register'),
-    'publisher':             ('backend',  'panopticon:register'),
-    'recommended-links':     ('backend',  'rummager:index'),
-    'smartanswers':          ('frontend', 'panopticon:register'),
-    'trade-tariff-frontend': ('frontend', 'panopticon:register'),
-    'whitehall-admin':       ('backend',  'rummager:index'),
+    'calendars':         ('frontend', 'panopticon:register'),
+    'licencefinder':     ('frontend', 'panopticon:register'),
+    'publisher':         ('backend',  'panopticon:register'),
+    'recommended-links': ('backend',  'rummager:index'),
+    'smartanswers':      ('frontend', 'panopticon:register'),
+    'tariff':            ('frontend', 'panopticon:register'),
+    'whitehall-admin':   ('backend',  'rummager:index'),
 }
 
 @task
