@@ -25,8 +25,13 @@ def reindex(app=None):
 
     Rebuild search indices
 
-    (e.g. 'fab search.reindex' or 'fab
-    search.reindex:calendars)
+    To reindex all applications, run
+
+      fab search.reindex
+
+    To reindex only one application, e.g. calendars, you can do
+
+      fab search.reindex:calendars
 
     """
 
