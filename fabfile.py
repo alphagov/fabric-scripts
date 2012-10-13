@@ -46,32 +46,32 @@ def list():
 
 @task
 def do(command):
-    "Execute arbitrary commands"
+    """Execute arbitrary commands"""
     run(command)
 
 @task
 def sdo(command):
-    "Execute arbitrary commands with sudo"
+    """Execute arbitrary commands with sudo"""
     sudo(command)
 
 @task
 def uptime():
-    "Show uptime and load"
+    """Show uptime and load"""
     run('uptime')
 
 @task
 def free():
-    "Show memory stats"
+    """Show memory stats"""
     run('free')
 
 @task
 def updates():
-    "Show package counts needing updates"
+    """Show package counts needing updates"""
     run("cat /var/lib/update-notifier/updates-available")
 
 @task
 def upgrade():
-    "Upgrade packages with apt-get"
+    """Upgrade packages with apt-get"""
     sudo("apt-get update; apt-get upgrade -y")
 
 @task
