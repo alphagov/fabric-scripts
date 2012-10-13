@@ -10,6 +10,7 @@ from fabric.colors import *
 from fabric.api import *
 from fabric.task_utils import crawl
 
+import puppet
 import search
 
 env.hosts = []
@@ -73,9 +74,4 @@ def updates():
 def upgrade():
     """Upgrade packages with apt-get"""
     sudo("apt-get update; apt-get upgrade -y")
-
-@task
-def puppet(*args):
-    """Run puppet agent"""
-    sudo('RUBYOPT="-W0" puppet agent --onetime --no-daemonize %s' % ' '.join(args))
 
