@@ -12,6 +12,7 @@ from fabric.task_utils import crawl
 
 import puppet
 import search
+import cache
 
 env.hosts = []
 env.roledefs = defaultdict(list)
