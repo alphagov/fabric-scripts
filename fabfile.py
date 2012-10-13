@@ -75,9 +75,10 @@ def upgrade():
     sudo("apt-get update; apt-get upgrade -y")
 
 @task
-def puppet():
-    "Run puppet on a specific host or role (usage: 'fab -P -R class-cache puppet')"
-    run('govuk_puppet --verbose')
+def puppet(*args):
+    """Run puppet agent"""
+    sudo('RUBYOPT="-W0" puppet agent --onetime --no-daemonize %s' % ' '.join(args))
+
 
 def use_one_of(govuk_class):
     env.host_string = random.choice(env.roledefs['class-%s' % govuk_class])
