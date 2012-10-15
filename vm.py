@@ -24,3 +24,9 @@ def updates():
 def upgrade():
     """Upgrade packages with apt-get"""
     sudo("apt-get update; apt-get upgrade -y")
+
+@task
+def stopped_govuk_jobs():
+    """Find stopped govuk application jobs"""
+    with hide('running'):
+        run('grep -l govuk_spinup /etc/init/*.conf | xargs -n1 basename | while read line; do sudo status "${line%%.conf}"; done | grep stop')
