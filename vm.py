@@ -42,5 +42,5 @@ def bodge_unicorn(name):
 
     Yes. This is a bodge. Sorry.
     """
-    sudo("ps auxwww | grep '%s' | grep -F 'unicorn master' | awk '{ print $2 }' | xargs kill -9" % name)
+    sudo("ps auxwww | grep '%s' | grep -F 'unicorn master' | awk '{ print $2 }' | xargs kill -9 || :" % name)
     sudo("start '%s' || restart '%s'" % name)
