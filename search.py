@@ -54,4 +54,4 @@ def reindex_app(app):
     util.use_random_host('class-%s' % machine_class)
 
     with cd('/var/apps/%s' % app):
-        sudo('RAILS_ENV=production bundle exec rake "%s"' % task, user='deploy')
+        sudo('RAILS_ENV=production RACK_ENV=production bundle exec rake "%s"' % task, user='deploy')
