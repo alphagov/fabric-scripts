@@ -26,7 +26,21 @@ def upgrade():
     sudo("apt-get update; apt-get upgrade -y")
 
 @task
-def stopped_govuk_jobs():
+def stopped_jobs():
     """Find stopped govuk application jobs"""
     with hide('running'):
         run('grep -l govuk_spinup /etc/init/*.conf | xargs -n1 basename | while read line; do sudo status "${line%%.conf}"; done | grep stop')
+
+@task
+def bodge_unicorn(name):
+    """
+    Manually kill off (and restart) unicorn processes by name
+
+    e.g. To kill off and restart contentapi
+
+      fab -H backend-1.backend.production vm.bodge_unicorn:contentapi
+
+    Yes. This is a bodge. Sorry.
+    """
+    sudo("ps auxwww | grep '%s' | grep -F 'unicorn master' | awk '{ print $2 }' | xargs kill -9" % name)
+    sudo("start '%s' || restart '%s'" % name)
