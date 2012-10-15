@@ -36,9 +36,9 @@ def bodge_unicorn(name):
     """
     Manually kill off (and restart) unicorn processes by name
 
-    e.g. To kill off and restart contentapi
+    e.g. To kill off and restart contentapi on backend-1
 
-      fab -H backend-1.backend.production vm.bodge_unicorn:contentapi
+      fab vm.bodge_unicorn:contentapi,hosts=backend-1.backend.production
 
     Yes. This is a bodge. Sorry.
     """
