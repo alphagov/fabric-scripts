@@ -29,7 +29,7 @@ def upgrade():
 def stopped_jobs():
     """Find stopped govuk application jobs"""
     with hide('running'):
-        run('grep -l govuk_spinup /etc/init/*.conf | xargs -n1 basename | while read line; do sudo status "${line%%.conf}"; done | grep stop')
+        run('grep -l govuk_spinup /etc/init/*.conf | xargs -n1 basename | while read line; do sudo status "${line%%.conf}"; done | grep stop || :')
 
 @task
 def bodge_unicorn(name):
