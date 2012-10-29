@@ -18,6 +18,12 @@ import vm
 env.hosts = []
 env.roledefs = defaultdict(list)
 
+from socket import gethostname;
+
+if re.match('^jumpbox',gethostname()) is None:
+  print "govuk_fab is designed to only run from a jumpbox"
+  sys.exit(1)
+
 with hide('running'):
     hosts = local("awk '!/github|#|^$/ {print $1}' /etc/ssh/ssh_known_hosts | sort | uniq", capture=True)
     hosts = hosts.splitlines()
