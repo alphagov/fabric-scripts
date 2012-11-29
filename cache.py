@@ -12,9 +12,8 @@ def purge(*args):
 def restart():
     """
     Restart Varnish caches
-    Runs sudo remotely in order to pick up permissions in sudoers
     """
-    sdo('/etc/init.d/varnish restart')
+    sudo('/etc/init.d/varnish restart')
 
 @task(default=True)
 @roles('class-cache')
