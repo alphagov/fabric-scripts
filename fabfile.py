@@ -1,4 +1,5 @@
 from collections import defaultdict
+from socket import gethostname
 import os
 import random
 import re
@@ -18,10 +19,8 @@ import vm
 env.hosts = []
 env.roledefs = defaultdict(list)
 
-from socket import gethostname;
-
-if re.match('^jumpbox',gethostname()) is None:
-  print "govuk_fab is designed to only run from a jumpbox"
+if re.match('^jumpbox', gethostname()) is None:
+  print "govuk_fab is designed to run from a jumpbox"
   sys.exit(1)
 
 with hide('running'):
