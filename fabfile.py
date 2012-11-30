@@ -12,6 +12,7 @@ from fabric.api import *
 from fabric.task_utils import crawl
 
 import puppet
+import licensify
 import search
 import cache
 import vm
