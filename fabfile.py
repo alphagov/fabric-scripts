@@ -11,10 +11,12 @@ from fabric.colors import *
 from fabric.api import *
 from fabric.task_utils import crawl
 
-import puppet
-import licensify
-import search
+# Our command submodules
 import cache
+import licensify
+import mongo
+import puppet
+import search
 import vm
 
 env.hosts = []
