@@ -31,7 +31,7 @@ def facter(*args):
     if proc.returncode != 0:
         raise RuntimeError("facter returned non-zero exit code! (args={0})".format(args))
 
-    return json.load(out)
+    return json.loads(out)
 
 if facter('govuk_class')['govuk_class'] != 'jumpbox':
   print "govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)"
