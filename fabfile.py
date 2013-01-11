@@ -1,10 +1,13 @@
 from collections import defaultdict
 from socket import gethostname
+import json
 import os
 import random
 import re
 import sys
 import textwrap
+import urllib
+import urllib2
 
 from fabric import state
 from fabric.colors import *
@@ -27,11 +30,9 @@ if re.match('^jumpbox', gethostname()) is None:
   sys.exit(1)
 
 with hide('running'):
-    hosts = local("awk '!/github|#|^$/ {print $1}' /etc/ssh/ssh_known_hosts | sort | uniq", capture=True)
-    hosts = hosts.splitlines()
-
-    if not hosts:
-        warn("Couldn't read any hosts from /etc/ssh/ssh_known_hosts!")
+    qs = urllib.urlencode({'query': '["=", ["node", "active"], true]'})
+    req = urllib2.urlopen('http://puppet-1.management.production/nodes?{0}'.format(qs))
+    hosts = json.load(res)
 
 for host in hosts:
     name, vdc, org = host.rsplit('.', 3)
