@@ -27,7 +27,9 @@ env.hosts = []
 env.roledefs = defaultdict(list)
 
 def facter(*args):
-    proc = subprocess.Popen(['facter', '--json', *args], stdout=subprocess.PIPE)
+    facter_args = ['facter', '--json']
+    facter_args.extend(args)
+    proc = subprocess.Popen(facter_args, stdout=subprocess.PIPE)
     out, err = proc.communicate()
 
     if proc.returncode != 0:
