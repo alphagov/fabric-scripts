@@ -5,6 +5,7 @@ import os
 import random
 import re
 import sys
+import subprocess
 import textwrap
 import urllib
 import urllib2
@@ -25,8 +26,17 @@ import vm
 env.hosts = []
 env.roledefs = defaultdict(list)
 
-if re.match('^jumpbox', gethostname()) is None:
-  print "govuk_fab is designed to run from a jumpbox"
+def facter(*args):
+    proc = subprocess.Popen(['facter', '--json', *args], stdout=subprocess.PIPE)
+    out, err = proc.communicate()
+
+    if proc.returncode != 0:
+        raise RuntimeError("facter returned non-zero exit code! (args={0})".format(args))
+
+    return json.load(out)
+
+if facter('govuk_class')['govuk_class'] != 'jumpbox':
+  print "govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)"
   sys.exit(1)
 
 with hide('running'):
