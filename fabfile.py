@@ -36,7 +36,7 @@ def facter(*args):
     return json.loads(out)
 
 if facter('govuk_class')['govuk_class'] != 'jumpbox':
-    print("ERROR: govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)", out=sys.stderr)
+    print("ERROR: govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)", file=sys.stderr)
     sys.exit(1)
 
 with hide('running'):
@@ -48,7 +48,7 @@ for host in hosts:
     try:
         name, vdc, org = host.rsplit('.', 3)
     except ValueError:
-        print("WARNING: discarding badly formatted hostname '{0}'".format(host), out=sys.stderr)
+        print("WARNING: discarding badly formatted hostname '{0}'".format(host), file=sys.stderr)
         continue
 
     env.roledefs['all'].append(host)
