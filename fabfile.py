@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from collections import defaultdict
 import json
 import sys
@@ -34,8 +36,8 @@ def facter(*args):
     return json.loads(out)
 
 if facter('govuk_class')['govuk_class'] != 'jumpbox':
-  print "govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)"
-  sys.exit(1)
+    print("ERROR: govuk_fab is designed to run from a jumpbox (govuk_class != jumpbox)", out=sys.stderr)
+    sys.exit(1)
 
 with hide('running'):
     qs = urllib.urlencode({'query': '["=", ["node", "active"], true]'})
@@ -43,7 +45,12 @@ with hide('running'):
     hosts = json.load(res)
 
 for host in hosts:
-    name, vdc, org = host.rsplit('.', 3)
+    try:
+        name, vdc, org = host.rsplit('.', 3)
+    except ValueError:
+        print("WARNING: discarding badly formatted hostname '{0}'".format(host), out=sys.stderr)
+        continue
+
     env.roledefs['all'].append(host)
     env.roledefs['org-%s' % org].append(host)
     env.roledefs['vdc-%s' % vdc].append(host)
@@ -60,15 +67,15 @@ def help(name):
     puts(textwrap.dedent(task.__doc__).strip())
 
 @task
-def list():
+def list(role='all'):
     """List known hosts"""
-    puts('\n'.join(sorted(hosts)))
+    puts('\n'.join(sorted(env.roledefs[role])))
 
 @task
 def list_roles():
     """List available roles"""
     for role in sorted(env.roledefs.keys()):
-      print "%-30.30s : %s" % (role, len(env.roledefs[role]))
+        print("%-30.30s : %s" % (role, len(env.roledefs[role])))
 
 @task
 def do(command):
