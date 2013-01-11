@@ -1,9 +1,5 @@
 from collections import defaultdict
-from socket import gethostname
 import json
-import os
-import random
-import re
 import sys
 import subprocess
 import textwrap
