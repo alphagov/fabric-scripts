@@ -41,7 +41,7 @@ if facter('govuk_class')['govuk_class'] != 'jumpbox':
 
 with hide('running'):
     qs = urllib.urlencode({'query': '["=", ["node", "active"], true]'})
-    res = urllib2.urlopen('http://puppet-1.management.production/nodes?{0}'.format(qs))
+    res = urllib2.urlopen('http://puppetdb.cluster/nodes?{0}'.format(qs))
     hosts = json.load(res)
 
 for host in hosts:
