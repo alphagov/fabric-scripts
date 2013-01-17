@@ -18,6 +18,7 @@ import cache
 import licensify
 import mongo
 import puppet
+import rkhunter
 import search
 import vm
 
