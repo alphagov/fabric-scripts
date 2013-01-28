@@ -1,8 +1,6 @@
 #!/bin/sh
 set -eu
 
-DEPLOY_TO="$(grep -E 'jumpbox-[0-9]+' /etc/ssh/ssh_known_hosts | awk '{ print $1 }' | cut -d, -f1 | xargs)"
-
-for server in $DEPLOY_TO; do
+govuk_node_list -c jumpbox | while read server; do
   rsync -av --delete --exclude='.git' "$(pwd)/" "deploy@${server}":/usr/local/share/govuk-fabric/
 done 
