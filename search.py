@@ -52,4 +52,9 @@ def reindex_app(app):
     machine_class, task = SEARCHABLE_APPS[app]
     util.use_random_host('class-%s' % machine_class)
 
-    util.rake(app, task)
+    # FIXME: Remove this horrible hack of a hack for a hack
+    if app == 'recommended-links':
+        with cd('/data/vhost/recommended-links.*/current'):
+            sudo('govuk_setenv "%s" bundle exec rake "%s"' % (app, task), user='deploy')
+    else:
+        util.rake(app, task)
