@@ -55,6 +55,6 @@ def reindex_app(app):
     # FIXME: Remove this horrible hack of a hack for a hack
     if app == 'recommended-links':
         with cd('/data/vhost/recommended-links.*/current'):
-            sudo('govuk_setenv "%s" bundle exec rake -v "%s"' % (app, task), user='deploy')
+            sudo('govuk_setenv default bundle exec rake -v "%s"' % (app, task), user='deploy')
     else:
         util.rake(app, task)
