@@ -50,8 +50,6 @@ def reindex_app(app):
     puts("Rebuilding search index for application '%s'" % app)
 
     machine_class, task = SEARCHABLE_APPS[app]
-
     util.use_random_host('class-%s' % machine_class)
 
-    with cd('/var/apps/%s' % app):
-        sudo('RAILS_ENV=production RACK_ENV=production bundle exec rake "%s"' % task, user='deploy')
+    util.rake(app, task)
