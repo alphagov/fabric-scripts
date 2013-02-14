@@ -9,7 +9,7 @@ SEARCHABLE_APPS = {
     'recommended-links': ('backend',  'rummager:index'),
     'smartanswers':      ('frontend', 'panopticon:register'),
     'tariff':            ('frontend', 'panopticon:register'),
-    'whitehall-admin':   ('backend',  'rummager:index'),
+    'whitehall':         ('backend',  'rummager:index'),
 }
 
 @task
