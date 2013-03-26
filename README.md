@@ -23,6 +23,10 @@ of setup on your part. You will need to install Fabric,
 
     $ pip install fabric
 
+NB:Iif you get a "pip: command not found" error, run this first:
+
+    $ sudo easy_install pip
+
 configure it (see [the fabric documentation][fabdoc] for more examples),
 
     $ echo 'user = jimbob' >> ~/.fabricrc
