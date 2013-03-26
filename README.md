@@ -14,4 +14,25 @@ helper script, installed in `/usr/local/bin`
 In order to use the fabric scripts, you will need to enable ssh-agent
 forwarding when you connect to the jumpboxes. For example:
 
-    ssh -A jumpbox-1.management.production 
+    $ ssh -A jumpbox-1.management.production
+
+## Local usage
+
+You can also use the fabric scripts from an external machine with a small amount
+of setup on your part. You will need to install Fabric,
+
+    $ pip install fabric
+
+configure it (see [the fabric documentation][fabdoc] for more examples),
+
+    $ echo 'user = jimbob' >> ~/.fabricrc
+
+and then you should be able to run it:
+
+    $ fab preview all hosts
+    ...
+    $ fab preview class:frontend do:'uname -a'
+    ...
+
+[fabdoc]: http://docs.fabfile.org/en/latest/usage/fab.html
+
