@@ -1,16 +1,12 @@
 from __future__ import print_function
 
 from collections import defaultdict
-import json
 import os
-import sys
 import textwrap
-import urllib
-import urllib2
 
 from fabric import state
-from fabric.colors import *
-from fabric.api import *
+from fabric.api import (abort, env, get, hide, local, puts, run, runs_once,
+                        settings, sudo, task, warn)
 from fabric.task_utils import crawl
 
 # Our command submodules
