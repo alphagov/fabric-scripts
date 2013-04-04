@@ -4,7 +4,8 @@ from fabric.api import env, cd, sudo
 
 def use_random_host(role):
     """Use a randomly chosen host from the given role"""
-    env.host_string = random.choice(env.roledefs[role])
+    hosts = env.roledefs[role]()
+    env.host_string = random.choice(hosts)
 
 def rake(app, task):
     """Run a rake task for the specified application"""
