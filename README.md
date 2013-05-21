@@ -21,7 +21,7 @@ forwarding when you connect to the jumpboxes. For example:
 You can also use the fabric scripts from an external machine with a small amount
 of setup on your part. You will need to install Fabric,
 
-    $ pip install fabric
+    $ pip install -Ur requirements.txt
 
 NB:Iif you get a "pip: command not found" error, run this first:
 
