@@ -13,6 +13,7 @@ from fabric.task_utils import crawl
 import cache
 import licensify
 import mongo
+import nginx
 import puppet
 import rkhunter
 import search
