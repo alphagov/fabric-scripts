@@ -23,7 +23,7 @@ of setup on your part. You will need to install Fabric,
 
     $ pip install -Ur requirements.txt
 
-NB:Iif you get a "pip: command not found" error, run this first:
+NB: if you get a "pip: command not found" error, run this first:
 
     $ sudo easy_install pip
 
