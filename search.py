@@ -11,6 +11,7 @@ SEARCHABLE_APPS = {
     'recommended-links':     ('backend',  ['rummager:index']),
     'smartanswers':          ('frontend', ['panopticon:register']),
     'tariff':                ('frontend', ['panopticon:register']),
+    'travel-advice-publisher':('backend', ['panopticon:register', 'panopticon:reregister_editions']),
     'whitehall':             ('backend',  ['rummager:index']),
 }
 
