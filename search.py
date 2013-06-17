@@ -4,6 +4,7 @@ import util
 
 SEARCHABLE_APPS = {
     'calendars':             ('frontend', 'panopticon:register'),
+    'frontend':              ('frontend', 'rummager:index'),
     'licencefinder':         ('frontend', 'panopticon:register'),
     'businesssupportfinder': ('frontend', 'panopticon:register'),
     'publisher':             ('backend',  'panopticon:register'),
