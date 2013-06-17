@@ -3,15 +3,15 @@ from fabric.api import *
 import util
 
 SEARCHABLE_APPS = {
-    'calendars':             ('frontend', 'panopticon:register'),
-    'frontend':              ('frontend', 'rummager:index'),
-    'licencefinder':         ('frontend', 'panopticon:register'),
-    'businesssupportfinder': ('frontend', 'panopticon:register'),
-    'publisher':             ('backend',  'panopticon:register'),
-    'recommended-links':     ('backend',  'rummager:index'),
-    'smartanswers':          ('frontend', 'panopticon:register'),
-    'tariff':                ('frontend', 'panopticon:register'),
-    'whitehall':             ('backend',  'rummager:index'),
+    'calendars':             ('frontend', ['panopticon:register']),
+    'frontend':              ('frontend', ['rummager:index']),
+    'licencefinder':         ('frontend', ['panopticon:register']),
+    'businesssupportfinder': ('frontend', ['panopticon:register']),
+    'publisher':             ('backend',  ['panopticon:register']),
+    'recommended-links':     ('backend',  ['rummager:index']),
+    'smartanswers':          ('frontend', ['panopticon:register']),
+    'tariff':                ('frontend', ['panopticon:register']),
+    'whitehall':             ('backend',  ['rummager:index']),
 }
 
 @task
@@ -51,12 +51,13 @@ def reindex(app=None):
 def reindex_app(app):
     puts("Rebuilding search index for application '%s'" % app)
 
-    machine_class, task = SEARCHABLE_APPS[app]
+    machine_class, tasks = SEARCHABLE_APPS[app]
     util.use_random_host('class-%s' % machine_class)
 
-    # FIXME: Remove this horrible hack of a hack for a hack
-    if app == 'recommended-links':
-        with cd('/data/vhost/recommended-links.*/current'):
-            sudo('govuk_setenv default bundle exec rake -v "%s"' % task, user='deploy')
-    else:
-        util.rake(app, task)
+    for task in tasks:
+        # FIXME: Remove this horrible hack of a hack for a hack
+        if app == 'recommended-links':
+            with cd('/data/vhost/recommended-links.*/current'):
+                sudo('govuk_setenv default bundle exec rake -v "%s" --trace' % task, user='deploy')
+        else:
+            util.rake(app, task)
