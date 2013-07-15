@@ -21,12 +21,10 @@ def enable():
 @task
 def check_disabled():
     """Check if puppet runs are disabled"""
-    lockfile = '/var/lib/puppet/state/puppetdlock'
+    lockfile = '/var/lib/puppet/state/agent_disabled.lock'
 
-    # Puppet is disabled if the lockfile exists and has zero size (whereas a
-    # running puppet agent will write its PID to the lockfile)
     with hide('running'):
-        run('test -e {0} -a ! -s {0} && echo DISABLED || echo ENABLED'.format(lockfile))
+        run('test -f {0} && echo DISABLED || echo ENABLED'.format(lockfile))
 
 @task
 def dryrun(*args):
