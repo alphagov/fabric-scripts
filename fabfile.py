@@ -10,6 +10,7 @@ from fabric.api import (abort, env, get, hide, local, puts, run, runs_once,
 from fabric.task_utils import crawl
 
 # Our command submodules
+import apt
 import cache
 import licensify
 import mongo

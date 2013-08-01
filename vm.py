@@ -16,16 +16,6 @@ def disk():
     run('df -kh')
 
 @task
-def updates():
-    """Show package counts needing updates"""
-    run("cat /var/lib/update-notifier/updates-available")
-
-@task
-def upgrade():
-    """Upgrade packages with apt-get"""
-    sudo("apt-get update; apt-get upgrade -y")
-
-@task
 def stopped_jobs():
     """Find stopped govuk application jobs"""
     with hide('running'):
