@@ -15,6 +15,7 @@ import cache
 import licensify
 import mongo
 import nginx
+import ntp
 import puppet
 import rkhunter
 import search
