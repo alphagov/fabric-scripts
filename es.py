@@ -9,3 +9,8 @@ def delete(index):
 def status(index):
     """Get the status of an index"""
     run("curl -XGET 'http://localhost:9200/%s/_status'" % index)
+
+@task
+def cluster_health():
+    """Get the status of an index"""
+    run("curl -XGET 'http://localhost:9200/_cluster/health'")
