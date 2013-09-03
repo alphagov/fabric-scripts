@@ -1,9 +1,13 @@
 from fabric.api import *
+import re
 
 @task
 def delete(index):
     """Delete an index"""
-    run("curl -XDELETE 'http://localhost:9200/%s'" % index)
+    if re.match('^[^/]+$', index):
+      run("curl -XDELETE 'http://localhost:9200/%s'" % index)
+    else:
+      abort("Invalid index provided '%s'" % index)
 
 @task
 def status(index):
