@@ -13,6 +13,7 @@ from fabric.task_utils import crawl
 import app
 import apt
 import cache
+import es
 import licensify
 import mongo
 import nginx
