@@ -10,6 +10,11 @@ def gracefulstop(wait=True):
         run('while pgrep nginx >/dev/null; do echo "Waiting for Nginx to exit.."; sleep 1; done')
 
 @task
+def killnginx():
+    """Shut down Nginx immediately without waiting for it to finish running"""
+    sudo('service nginx stop')
+
+@task
 def gracefulstart():
     """Start up Nginx on a machine"""
     sudo('service nginx start')
@@ -17,5 +22,5 @@ def gracefulstart():
 @task
 def hello_it():
     """Turns Nginx off and on again"""
-    gracefulstop()
+    killnginx()
     gracefulstart()
