@@ -15,6 +15,7 @@ import apt
 import cache
 import es
 import licensify
+import logstream
 import mongo
 import nginx
 import ntp
