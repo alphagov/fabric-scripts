@@ -13,5 +13,5 @@ def resync():
     forcing a manual intervention.
     """
     sudo("service ntp stop")
-    sudo("ntpdate ntp.ubuntu.com")
+    sudo("ntpdate -B ntp.ubuntu.com")
     sudo("service ntp start")
