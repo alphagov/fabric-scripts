@@ -40,3 +40,10 @@ def bodge_unicorn(name):
     if pid:
         sudo("kill -9 %s" % pid)
     sudo("start '{0}' || restart '{0}'".format(name))
+
+@task
+def sync_ntp():
+    """Sync ntp against ntp.ubuntu.com to fix ntp drift"""
+    sudo("service ntp stop")
+    sudo("ntpdate ntp.ubuntu.com")
+    sudo("service ntp start")
