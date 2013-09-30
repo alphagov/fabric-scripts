@@ -18,4 +18,4 @@ def packages_with_reboots(*args):
 @task
 def reset_reboot_needed(*args):
     """Delete the flag file that triggers the 'reboot required by apt' Nagios check"""
-    sudo('rm /var/run/reboot-required')
+    sudo('rm -f /var/run/reboot-required')
