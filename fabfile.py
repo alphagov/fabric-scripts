@@ -1,8 +1,10 @@
 from __future__ import print_function
 
 from collections import defaultdict
+from hashlib import md5
 import os
 import textwrap
+import time
 
 from fabric import state
 from fabric.api import (abort, env, get, hide, local, puts, run, runs_once,
@@ -26,6 +28,9 @@ import vm
 
 HERE = os.path.dirname(__file__)
 SSH_DIR = os.path.join(HERE, '.ssh')
+
+# How old a local hosts file can be before we check for an update
+HOSTS_FILE_CACHE_TIME = 3600 * 24
 
 ABORT_MSG = textwrap.dedent("""
     You must select an environment before running this task, e.g.
@@ -132,11 +137,39 @@ def _fetch_known_hosts():
 
     known_hosts_file = os.path.join(SSH_DIR, env.gateway)
 
-    if not os.path.exists(known_hosts_file):
+    remote_known_hosts_file = "/etc/ssh/ssh_known_hosts"
+
+    if _known_hosts_outdated(known_hosts_file, remote_known_hosts_file):
+        print("Updating local copy of %s hosts" % env.gateway)
         with settings(host_string=env.gateway, gateway=None):
             get('/etc/ssh/ssh_known_hosts', known_hosts_file)
 
     return known_hosts_file
+
+def _known_hosts_outdated(local_filename, remote_filename):
+    """Check whether a local copy of a jumpbox hosts file is outdated.
+    
+    We keep a local copy of known hosts from each jumpbox to use when we want
+    to run a command against a whole class of hosts (or indeed all of them). We
+    need to make sure this is kept reasonably current, so we run commands
+    against the right machines.
+    
+    """
+    if not os.path.exists(local_filename):
+        return True
+
+    # Give the file a grace period, so we don't go checking every single time
+    if time.time() - os.path.getmtime(local_filename) < HOSTS_FILE_CACHE_TIME:
+        return False
+
+    # Compare local and remote checksums to see whether we need to update
+    local_checksum = md5(open(local_filename).read()).hexdigest()
+    with hide('running', 'stdout'):
+        with settings(host_string=env.gateway, gateway=None):
+            remote_checksum = run("md5sum %s" % remote_filename).split()[0]
+
+    return local_checksum != remote_checksum
+
 
 def _set_gateway(name):
     """
