@@ -40,3 +40,14 @@ def bodge_unicorn(name):
     if pid:
         sudo("kill -9 %s" % pid)
     sudo("start '{0}' || restart '{0}'".format(name))
+
+@task
+def reboot():
+  """Schedule a host for downtime in nagios and reboot
+
+  Usage:
+  fab production -H frontend-1.frontend.production vm.reboot
+  """
+  from nagios import schedule_downtime
+  execute(schedule_downtime, env['host_string'])
+  run("sudo shutdown -r now")
