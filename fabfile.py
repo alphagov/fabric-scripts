@@ -17,6 +17,7 @@ import es
 import licensify
 import logstream
 import mongo
+import nagios
 import nginx
 import ntp
 import puppet
