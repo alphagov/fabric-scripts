@@ -2,7 +2,6 @@ from StringIO import StringIO
 import string
 
 from fabric.api import *
-#from fabric.contrib.files import append
 
 
 NAGIOS_CMD_FILE = '/var/lib/nagios3/rw/nagios.cmd'
