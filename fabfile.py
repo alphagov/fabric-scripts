@@ -25,6 +25,7 @@ import ntp
 import puppet
 import rkhunter
 import search
+import statsd
 import vm
 
 HERE = os.path.dirname(__file__)
