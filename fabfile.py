@@ -16,6 +16,7 @@ import app
 import apt
 import cache
 import es
+import incident
 import licensify
 import logstream
 import mongo
