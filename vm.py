@@ -36,7 +36,7 @@ def bodge_unicorn(name):
 
     Yes. This is a bodge. Sorry.
     """
-    pid = run("ps auxwww | grep '%s' | grep -F 'unicorn master' | grep -v grep | awk '{ print $2 }' | xargs" % name)
+    pid = run("ps auxwww | grep '/%s/' | grep -F 'unicorn master' | grep -v grep | awk '{ print $2 }' | xargs" % name)
     if pid:
         sudo("kill -9 %s" % pid)
     sudo("start '{0}' || restart '{0}'".format(name))
