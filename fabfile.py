@@ -15,6 +15,7 @@ from fabric.task_utils import crawl
 import app
 import apt
 import cache
+import campaigns
 import es
 import licensify
 import logstream
@@ -150,12 +151,12 @@ def _fetch_known_hosts():
 
 def _known_hosts_outdated(local_filename, remote_filename):
     """Check whether a local copy of a jumpbox hosts file is outdated.
-    
+
     We keep a local copy of known hosts from each jumpbox to use when we want
     to run a command against a whole class of hosts (or indeed all of them). We
     need to make sure this is kept reasonably current, so we run commands
     against the right machines.
-    
+
     """
     if not os.path.exists(local_filename):
         return True
