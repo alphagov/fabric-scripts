@@ -12,7 +12,7 @@ def validate_classes(campaign_class):
     """Checks that the campaign class is valid"""
     if campaign_class in ['red', 'black', 'green']:
         return campaign_class
-    raise Exception, "Invalid class %s, valid values are 'red', 'black', 'reen'" % campaign_class
+    raise Exception, "Invalid class %s, valid values are 'red', 'black', 'green'" % campaign_class
 
 
 @task
