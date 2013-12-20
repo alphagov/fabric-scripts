@@ -6,6 +6,8 @@ from fabric.tasks import execute
 
 from jinja2 import Template
 
+from vm import reload_unicorn
+
 def validate_classes(campaign_class):
     """Checks that the campaign class is valid"""
     if campaign_class in ['red', 'black', 'green']:
@@ -38,7 +40,7 @@ def deploy_to_homepage():
     remote_filename = '/var/apps/frontend/app/views/root/_campaign_notification.html.erb'
     put(StringIO.StringIO(contents), remote_filename, use_sudo=True, mirror_local_mode=True)
     sudo('chown deploy:deploy %s' % remote_filename)
-    sudo('reload frontend')
+    execute(reload_unicorn, name='frontend')
     print "Campaign deployed. Please ensure this is copied into the frontend repository to ensure it's stable across deploys"
 
 @task
@@ -47,4 +49,4 @@ def remove_from_homepage():
     remote_filename = '/var/apps/frontend/app/views/root/_campaign_notification.html.erb'
     put(StringIO.StringIO(''), remote_filename, use_sudo=True, mirror_local_mode=True)
     sudo('chown deploy:deploy %s' % remote_filename)
-    sudo('reload frontend')
+    execute(reload_unicorn, name='frontend')
