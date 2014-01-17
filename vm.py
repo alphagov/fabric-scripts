@@ -16,6 +16,11 @@ def disk():
     run('df -kh')
 
 @task
+def os_version():
+    """Show operating system"""
+    run('facter lsbdistcodename lsbdistdescription operatingsystem operatingsystemrelease')
+
+@task
 def stopped_jobs():
     """Find stopped govuk application jobs"""
     with hide('running'):
