@@ -13,6 +13,7 @@ def upgrade():
 @task
 def dist_upgrade():
     """Perform non-interactive dist-upgrade using apt-get"""
+    prompt('dist-upgrade is a dangerous operation, can remove packages and generally break all the things. Are you sure you want to proceed? (y/n)', validate=r'^[Yy]$')
     sudo("apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" -yuq dist-upgrade")
 
 @task(default=True)
