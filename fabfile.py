@@ -17,6 +17,7 @@ import apt
 import cache
 import campaigns
 import es
+import incident
 import licensify
 import logstream
 import mongo
