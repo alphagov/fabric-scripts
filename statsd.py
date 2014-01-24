@@ -1,3 +1,4 @@
+import re
 from fabric.api import *
 
 
@@ -12,4 +13,6 @@ def create_counter(name):
 
     Read about carbon-aggregator counters before using this task:
     https://github.gds/pages/gds/opsmanual/2nd-line/nagios.html#nginx-5xx-rate-too-high-for-many-apps-boxes"""
+    # remove an initial stats. prefix if present
+    name = re.sub(r"^stats\.","",name)
     run("echo -n '%s:0|c' > /dev/udp/localhost/8125" % name)
