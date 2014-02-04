@@ -1,5 +1,6 @@
 from StringIO import StringIO
 import string
+import requests
 
 from fabric.api import *
 
@@ -49,3 +50,24 @@ def schedule_downtime(host,minutes='20'):
     }
     submit_nagios_cmd(command)
     submit_nagios_cmd(comment)
+
+
+@task
+@runs_once
+def loadhosts():
+    """Load hosts from an Icinga URL in jsonformat.
+
+    Prompts for a URL like:
+        https://nagios.example.com/cgi-bin/icinga/status.cgi?search_string=puppet+last+run&limit=0&start=1&servicestatustypes=29
+    """
+
+    url = prompt("Icinga URL (jsonformat): ")
+    resp = requests.get(url, verify=False)
+    hosts = [
+        service['host_name'].split('.production').pop(0)
+        for service in resp.json()['status']['service_status']
+    ]
+
+    print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
+    prompt("Type 'yes' to confirm: ", validate="yes")
+    env.hosts = hosts
