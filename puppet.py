@@ -1,7 +1,7 @@
 from fabric.api import *
 
 def puppet(*args):
-    sudo('RUBYOPT="-W0" puppet %s' % ' '.join(args))
+    sudo('puppet %s' % ' '.join(args))
 
 @task(default=True)
 def agent(*args):
