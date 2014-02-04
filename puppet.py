@@ -1,22 +1,22 @@
 from fabric.api import *
 
 def puppet(*args):
-    sudo('puppet %s' % ' '.join(args))
+    sudo('govuk_puppet %s' % ' '.join(args))
 
 @task(default=True)
 def agent(*args):
     """Run puppet agent"""
-    puppet('agent', '--onetime', '--no-daemonize', *args)
+    puppet(*args)
 
 @task
 def disable():
     """Disable puppet runs"""
-    puppet('agent', '--disable')
+    puppet('--disable')
 
 @task
 def enable():
     """Enable puppet runs"""
-    puppet('agent', '--enable')
+    puppet('--enable')
 
 @task
 def check_disabled():
@@ -29,4 +29,4 @@ def check_disabled():
 @task
 def dryrun(*args):
     """Run puppet agent but make no changes to the system"""
-    puppet('agent', '--onetime', '--no-daemonize', '--noop', *args)
+    puppet('--noop', *args)
