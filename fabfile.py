@@ -90,7 +90,7 @@ class RoleFetcher(object):
             # short name.
             short_host = '{0}.{1}'.format(name, vdc)
 
-            cls = name.rstrip('-1234567890')
+            cls = name.rstrip('-1234567890').replace('-', '_')
             self.roledefs['all'].append(short_host)
             self.roledefs['class-%s' % cls].append(short_host)
             self.roledefs['vdc-%s' % vdc].append(short_host)
