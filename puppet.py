@@ -9,9 +9,9 @@ def agent(*args):
     puppet(*args)
 
 @task
-def disable():
-    """Disable puppet runs"""
-    puppet('--disable')
+def disable(reason):
+    """Disable puppet runs. Requires a reason as a string arg"""
+    puppet('--disable "%s"' % reason)
 
 @task
 def enable():
