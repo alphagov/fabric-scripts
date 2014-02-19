@@ -6,6 +6,12 @@ def updates():
     run("cat /var/lib/update-notifier/updates-available")
 
 @task
+def security_updates():
+    """Show outstading security updates"""
+    run("/usr/local/bin/govuk_check_security_upgrades --human-readable")
+
+
+@task
 def upgrade():
     """Upgrade packages with apt-get"""
     sudo("apt-get update; apt-get upgrade -y")
