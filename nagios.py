@@ -27,7 +27,7 @@ def _nagios_hostname(host):
 
 
 @task
-@hosts(['monitoring.management'])
+@hosts(['alert.cluster'])
 def schedule_downtime(host,minutes='20'):
     """Schedules downtime for a host in nagios; default for 20 minutes"""
 
