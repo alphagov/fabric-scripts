@@ -5,7 +5,7 @@ import requests
 from fabric.api import *
 
 
-NAGIOS_CMD_FILE = '/var/lib/nagios3/rw/nagios.cmd'
+NAGIOS_CMD_FILE = '/var/lib/icinga/rw/nagios.cmd'
 
 
 def submit_nagios_cmd(command):
