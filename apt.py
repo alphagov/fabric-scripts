@@ -22,6 +22,16 @@ def dist_upgrade():
     prompt('dist-upgrade is a dangerous operation, can remove packages and generally break all the things. Are you sure you want to proceed? (y/n)', validate=r'^[Yy]$')
     sudo("apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" -yuq dist-upgrade")
 
+@task
+def unattended_upgrade():
+    """Perform an unattended-upgrade"""
+    sudo("unattended-upgrade -d")
+
+@task
+def unattended_upgrade_dry_run():
+    """Perform an unattended-upgrade dry run"""
+    sudo("unattended-upgrade -d --dry-run")
+
 @task(default=True)
 def packages_with_reboots(*args):
     """Find out the packages that require a reboot"""
