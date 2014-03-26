@@ -196,19 +196,9 @@ def help(name):
     puts(textwrap.dedent(task.__doc__).strip())
 
 @task
-def p1production():
-    """Select platform1 production environment"""
-    _set_gateway('p1production')
-
-@task
 def production():
     """Select production environment"""
     _set_gateway('production')
-
-@task
-def p1staging():
-    """Select platform1 staging environment"""
-    _set_gateway('p1staging')
 
 @task
 def staging():
