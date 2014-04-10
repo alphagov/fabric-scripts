@@ -40,12 +40,18 @@ def status():
     with hide('output'):
         status = run_mongo_command("rs.status()")
         print("Status at %s" % status['date'])
+        parsed_statuses = []
+        parsed_statuses.append(['Name', 'Health', 'State', 'Heartbeat'])
+
         for member_status in status['members']:
             name = node_name(member_status['name'])
             health = "OK" if member_status['health'] == 1 else "ERROR"
             state = member_status['stateStr']
             heartbeat = member_status.get('lastHeartbeat', '')
-            print("%s %s % -10s %s" % (name, health, state, heartbeat))
+            parsed_statuses.append([name, health, state, heartbeat])
+
+        for status in parsed_statuses:
+            print("| {0:<22} | {1:<8} | {2:<10} | {3:<22} |".format(status[0], status[1], status[2], status[3]))
 
 @task
 def step_down_primary(seconds='100'):
