@@ -9,15 +9,16 @@ today = date.today().strftime("%a %b %d")
 def node_name(node_name):
     return node_name.split('.production').pop(0)
 
-def strip_isodate(raw_output):
-    return re.sub(r'ISODate\((.*?)\)', r'\1', raw_output)
+def strip_dates(raw_output):
+    stripped_isodates = re.sub(r'ISODate\((.*?)\)', r'\1', raw_output)
+    return re.sub(r'Timestamp\((.*?)\)', r'"\1"', stripped_isodates)
 
 def mongo_command(command):
     return "mongo --quiet --eval 'printjson(%s)'" % command
 
 def run_mongo_command(command):
     return json.loads(
-            strip_isodate(
+            strip_dates(
                 run(mongo_command(command))))
 
 @task(default=True)
