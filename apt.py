@@ -35,7 +35,8 @@ def unattended_upgrade_dry_run():
 @task(default=True)
 def packages_with_reboots(*args):
     """Find out the packages that require a reboot"""
-    sudo('cat /var/run/reboot-required.pkgs')
+    package_reboot_file = '/var/run/reboot-required.pkgs'
+    sudo('if [ -f {0} ]; then cat {0}; else echo No packages with reboots; fi'.format(package_reboot_file))
 
 @task
 def reset_reboot_needed(*args):
