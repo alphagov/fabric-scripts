@@ -181,7 +181,10 @@ def _set_gateway(name):
     setting and makes sure that the correct known_hosts file will be consulted,
     then dynamically fetches a list of hosts from the gateway box.
     """
-    env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
+    if name == 'preview_carrenza':
+        env.gateway = 'jumpbox.provider1.preview.govuk.service.gov.uk'
+    else:
+        env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
     env.system_known_hosts = _fetch_known_hosts()
     env.roledefs.fetch()
 
@@ -209,6 +212,11 @@ def staging():
 def preview():
     """Select preview environment"""
     _set_gateway('preview')
+
+@task
+def preview_carrenza():
+    """Select preview environment"""
+    _set_gateway('preview_carrenza')
 
 @task
 def all():
