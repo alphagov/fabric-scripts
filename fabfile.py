@@ -16,6 +16,7 @@ import app
 import apt
 import cache
 import campaigns
+import cdn
 import es
 import incident
 import licensify
