@@ -65,3 +65,14 @@ def reboot():
   from nagios import schedule_downtime
   execute(schedule_downtime, env['host_string'])
   run("sudo shutdown -r now")
+
+@task
+def poweroff():
+  """Schedule a host for downtime in nagios and shutdown the VM
+
+  Usage:
+  fab production -H frontend-1.frontend.production vm.poweroff
+  """
+  from nagios import schedule_downtime
+  execute(schedule_downtime, env['host_string'])
+  run("sudo poweroff")
