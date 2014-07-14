@@ -1,5 +1,13 @@
 from fabric.api import *
 
+@task
+def loadhosts(*classnames):
+    """Load hosts that include given Puppet class(es)"""
+    classnames = ','.join(classnames)
+    with hide('running', 'stdout'):
+          with settings(host_string=env.gateway, gateway=None):
+              env.hosts = run('govuk_node_list -C %s' % classnames).splitlines()
+
 def puppet(*args):
     sudo('govuk_puppet %s' % ' '.join(args))
 
