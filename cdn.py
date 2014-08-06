@@ -8,3 +8,4 @@ def fastly_purge(*args):
     "Purge items from Fastly, eg \"/one,/two,/three\""
     for path in args:
         run("curl -s -X PURGE -H 'Host: www.gov.uk' http://www-gov-uk.map.fastly.net%s" % path.strip())
+        run("curl -s -X PURGE -H 'Host: assets.digital.cabinet-office.gov.uk' http://www-gov-uk.map.fastly.net%s" % path.strip())
