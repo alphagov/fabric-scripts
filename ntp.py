@@ -5,7 +5,6 @@ def status():
     """Report the VM's NTP status."""
     run("ntpq -p")
     run("/usr/lib/nagios/plugins/check_ntp_time -q -H ntp.ubuntu.com -w 2 -c 3", warn_only=True)
-    run("`awk -F= '/command\[check_ntp_peer\]/ { print $2 }' /etc/nagios/nrpe.d/check_ntp_peer.cfg`", warn_only=True)
 
 @task
 def resync():
