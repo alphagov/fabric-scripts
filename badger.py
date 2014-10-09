@@ -27,56 +27,20 @@ SAFE_MACHINES = [
 ]
 
 @task
-def reboot_safe_boxes_1():
+def reboot_safe_boxes(number="1"):
   """(NEEDS BADGER) Safely reboot a block of machines
 
   Reboot all machines which are:
     * safe to reboot[1]
     * not a datastore such as mongo or elasticsearch
     * not a monitoring box which will cause alert confusion if rebooted
-    * are numbered "1" in their group
+    * are numbered "number" in their group
 
   [1]: https://github.gds/pages/gds/opsmanual/2nd-line/rebooting-machines.html
   """
-  ones = re.compile('-1\\.')
-  env.hosts.extend(
-      filter(ones.search, SAFE_MACHINES)
-  )
-  vm.reboot()
-
-@task
-def reboot_safe_boxes_2():
-  """(NEEDS BADGER) Safely reboot a block of machines
-
-  Reboot all machines which are:
-    * safe to reboot[1]
-    * not a datastore such as mongo or elasticsearch
-    * not a monitoring box which will cause alert confusion if rebooted
-    * are numbered "2" in their group
-
-  [1]: https://github.gds/pages/gds/opsmanual/2nd-line/rebooting-machines.html
-  """
-  twos = re.compile('-2\\.')
-  env.hosts.extend(
-      filter(twos.search, SAFE_MACHINES)
-  )
-  vm.reboot()
-
-@task
-def reboot_safe_boxes_3():
-  """(NEEDS BADGER) Safely reboot a block of machines
-
-  Reboot all machines which are:
-    * safe to reboot[1]
-    * not a datastore such as mongo or elasticsearch
-    * not a monitoring box which will cause alert confusion if rebooted
-    * are numbered "3" in their group
-
-  [1]: https://github.gds/pages/gds/opsmanual/2nd-line/rebooting-machines.html
-  """
-  from vm import reboot
-  threes = re.compile('-3\\.')
-  env.hosts.extend(
-      filter(threes.search, SAFE_MACHINES)
-  )
-  vm.reboot()
+  if re.match('\A[1-7]\Z', number):
+    numbered = re.compile('-{number}\\.'.format(number=number))
+    env.hosts.extend(
+        filter(numbered.search, SAFE_MACHINES)
+    )
+    vm.reboot()
