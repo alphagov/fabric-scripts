@@ -40,7 +40,5 @@ def reboot_safe_boxes(number="1"):
   """
   if re.match('\A[1-7]\Z', number):
     numbered = re.compile('-{number}\\.'.format(number=number))
-    env.hosts.extend(
-        filter(numbered.search, SAFE_MACHINES)
-    )
-    vm.reboot()
+    hosts_to_reboot = filter(numbered.search, SAFE_MACHINES)
+    execute(vm.reboot, hosts=hosts_to_reboot)
