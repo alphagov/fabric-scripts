@@ -41,7 +41,10 @@ def find_primary():
     """Find which mongo node is the master"""
     with hide('output'):
         config = run_mongo_command("rs.isMaster()")
-        print("Current primary is %s" % node_name(config['primary']))
+        if 'primary' in config:
+            print("Current primary is %s" % node_name(config['primary']))
+        else:
+            print("No primary currently elected.")
 
 @task
 def status():
