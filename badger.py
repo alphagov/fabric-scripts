@@ -34,7 +34,7 @@ def reboot_safe_boxes(number="1"):
     * safe to reboot[1]
     * not a datastore such as mongo or elasticsearch
     * not a monitoring box which will cause alert confusion if rebooted
-    * are numbered "number" in their group
+    * are numbered "number" (default 1) in their group
 
   [1]: https://github.gds/pages/gds/opsmanual/2nd-line/rebooting-machines.html
   """
