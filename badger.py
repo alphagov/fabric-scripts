@@ -1,6 +1,6 @@
 from fabric.api import *
-from vm import reboot
 import re
+import vm
 
 SAFE_MACHINES = [
     'api-1.api',                       'api-2.api',
@@ -42,7 +42,7 @@ def reboot_safe_boxes_1():
   env.hosts.extend(
       filter(ones.search, SAFE_MACHINES)
   )
-  reboot()
+  vm.reboot()
 
 @task
 def reboot_safe_boxes_2():
@@ -60,7 +60,7 @@ def reboot_safe_boxes_2():
   env.hosts.extend(
       filter(twos.search, SAFE_MACHINES)
   )
-  reboot()
+  vm.reboot()
 
 @task
 def reboot_safe_boxes_3():
@@ -79,4 +79,4 @@ def reboot_safe_boxes_3():
   env.hosts.extend(
       filter(threes.search, SAFE_MACHINES)
   )
-  reboot()
+  vm.reboot()
