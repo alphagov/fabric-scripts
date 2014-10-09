@@ -28,7 +28,7 @@ SAFE_MACHINES = [
 
 @task
 def reboot_safe_boxes_1():
-  """GET THE BADGER BEFORE RUNNING THIS COMMAND
+  """(NEEDS BADGER) Safely reboot a block of machines
 
   Reboot all machines which are:
     * safe to reboot[1]
@@ -46,7 +46,7 @@ def reboot_safe_boxes_1():
 
 @task
 def reboot_safe_boxes_2():
-  """GET THE BADGER BEFORE RUNNING THIS COMMAND
+  """(NEEDS BADGER) Safely reboot a block of machines
 
   Reboot all machines which are:
     * safe to reboot[1]
@@ -64,7 +64,7 @@ def reboot_safe_boxes_2():
 
 @task
 def reboot_safe_boxes_3():
-  """GET THE BADGER BEFORE RUNNING THIS COMMAND
+  """(NEEDS BADGER) Safely reboot a block of machines
 
   Reboot all machines which are:
     * safe to reboot[1]
