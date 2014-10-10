@@ -68,16 +68,11 @@ def status():
 @task
 def step_down_primary(seconds='100'):
     """Step down as primary for a given number of seconds (default: 100)"""
-    with hide('output'):
-        # Mongo returns an exit code of 252 when the primary steps down, as well as disconnecting
-        # the current console session. This means that we have to run the command with Fabric's
-        # warn_only enabled, or Fabric will error.
-        result = run_mongo_command("rs.stepDown(%s)" % seconds, command_warn_only=True)
+    # Mongo returns an exit code of 252 when the primary steps down, as well as disconnecting
+    # the current console session. We need to mark that as okay so that run() won't error.
+    with hide('output'), settings(ok_ret_codes = [0,252]):
+        result = run_mongo_command("rs.stepDown(%s)" % seconds)
 
         if 'ok' in result and result['ok'] == 0:
             print("Failed to step down: %s\nTry running mongo.find_primary" % result['errmsg'])
             return 0
-
-        if 'return_code' in result and result['return_code'] == 252:
-            print "Received a 252 exit code from Mongo. There may have been disconnection warnings"
-            print "during the step down from primary that caused this. Verify the primary with mongo.find_primary."
