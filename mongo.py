@@ -16,19 +16,10 @@ def strip_dates(raw_output):
 def mongo_command(command):
     return "mongo --quiet --eval 'printjson(%s)'" % command
 
-def run_mongo_command(command, command_warn_only=False):
-    if command_warn_only:
-        with settings(warn_only=True):
-            response = run(mongo_command(command))
-    else:
-        response = run(mongo_command(command))
+def run_mongo_command(command):
+    response = run(mongo_command(command))
 
-    if response.return_code == 252:
-        dict_response = {"return_code": 252}
-    else:
-        dict_response = json.loads(strip_dates(response))
-
-    return dict_response
+    return json.loads(strip_dates(response))
 
 @task(default=True)
 @roles('class-mongo')
