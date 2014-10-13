@@ -18,7 +18,7 @@ import apt
 import cache
 import campaigns
 import cdn
-import es
+import elasticsearch
 import incident
 import kernel
 import licensify
