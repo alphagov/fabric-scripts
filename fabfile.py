@@ -15,6 +15,7 @@ from fabric.task_utils import crawl
 # Our command submodules
 import app
 import apt
+import badger
 import cache
 import campaigns
 import cdn
