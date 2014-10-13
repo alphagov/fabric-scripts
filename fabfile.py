@@ -115,19 +115,20 @@ class RoleFetcher(object):
         if not self.fetched:
             abort(ABORT_MSG)
 
-def _fetch_hosts():
+def _fetch_hosts(extra_args=''):
     """
     Fetch a list of hosts in this environment, regardless of whether we're
     executing from within the environment or via a gateway.
     """
+    list_cmd = 'govuk_node_list %s' % extra_args
     with hide('running', 'stdout'):
         if env.gateway:
             with settings(host_string=env.gateway, gateway=None):
-                return run('govuk_node_list').splitlines()
+                return run(list_cmd).splitlines()
 
         # Otherwise assume we're *in* the infrastructure
         else:
-            return local('govuk_node_list').splitlines()
+            return local(list_cmd).splitlines()
 
 def _fetch_known_hosts():
     """
@@ -231,6 +232,14 @@ def numbered(number):
 def klass(class_name):
     """Select a machine class"""
     env.hosts.extend(env.roledefs['class-%s' % class_name]())
+
+@task
+def puppet_class(class_name):
+    """Select all machines which include a given puppet class"""
+    hosts = _fetch_hosts('-C %s' % class_name)
+    if (hosts == []):
+        abort("Didn't find any hosts with class %s" % class_name)
+    env.hosts.extend(sorted(hosts))
 
 @task
 def vdc(vdc_name):
