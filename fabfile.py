@@ -3,12 +3,13 @@ from __future__ import print_function
 from collections import defaultdict
 from hashlib import md5
 import os
+import re
 import textwrap
 import time
 
 from fabric import state
 from fabric.api import (abort, env, get, hide, local, puts, run, runs_once,
-                        settings, sudo, task, warn)
+                        serial, settings, sudo, task, warn)
 from fabric.task_utils import crawl
 
 # Our command submodules
@@ -214,17 +215,26 @@ def preview():
 @task
 def all():
     """Select all machines in current environment"""
-    env.roles.append('all')
+    env.hosts.extend(env.roledefs['all']())
+
+@task
+@runs_once
+@serial
+def numbered(number):
+    """Select only machines with a given number"""
+    if (not re.match(r'\A[0-9]+\Z', number)):
+        abort("Unrecognised number: %s" % number)
+    env.hosts = [host for host in env.hosts if re.search((r'-%s\.' % number), host)]
 
 @task(name='class')
 def klass(class_name):
     """Select a machine class"""
-    env.roles.append('class-%s' % class_name)
+    env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 @task
 def vdc(vdc_name):
     """Select a virtual datacentre"""
-    env.roles.append('vdc-%s' % vdc_name)
+    env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
 
 @task
 @runs_once
