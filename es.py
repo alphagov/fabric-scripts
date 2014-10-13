@@ -1,5 +1,7 @@
 from fabric.api import *
+import json
 import re
+import vm
 
 @task
 def delete(index):
@@ -17,4 +19,12 @@ def status(index):
 @task
 def cluster_health():
     """Get the status of an index"""
-    run("curl -XGET 'http://localhost:9200/_cluster/health'")
+    return run("curl -XGET 'http://localhost:9200/_cluster/health'")
+
+@task
+def safe_reboot():
+    """Reboot only if the cluster is currently green"""
+    health = json.loads(cluster_health())
+    if (health['status'] != 'green'):
+        abort("Cluster health is %s, won't reboot" % health['status'])
+    execute(vm.reboot)
