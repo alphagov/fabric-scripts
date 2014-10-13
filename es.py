@@ -22,6 +22,8 @@ def cluster_health():
     return run("curl -XGET 'http://localhost:9200/_cluster/health'")
 
 @task
+@serial
+@runs_once
 def safe_reboot():
     """Reboot only if the cluster is currently green"""
     health = json.loads(cluster_health())
