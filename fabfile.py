@@ -20,6 +20,7 @@ import campaigns
 import cdn
 import es
 import incident
+import kernel
 import licensify
 import logstream
 import mongo
