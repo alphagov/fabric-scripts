@@ -57,13 +57,20 @@ def reload_unicorn(name):
 
 @task
 def reboot():
-  """Schedule a host for downtime in nagios and reboot
+  """Schedule a host for downtime in nagios and reboot (if required)
 
   Usage:
   fab production -H frontend-1.frontend.production vm.reboot
   """
   from nagios import schedule_downtime
-  execute(schedule_downtime, env['host_string'])
+  result = run("/usr/local/bin/check_reboot_required 30 0", warn_only=True)
+  if (not result.succeeded):      
+      execute(schedule_downtime, env['host_string'])
+      execute(force_reboot)
+
+@task
+def force_reboot():
+  """Schedule a host for downtime in nagios and force reboot (even if not required)"""
   run("sudo shutdown -r now")
 
 @task
