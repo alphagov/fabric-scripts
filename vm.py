@@ -66,7 +66,9 @@ def reboot():
   result = run("/usr/local/bin/check_reboot_required 30 0", warn_only=True)
   if (not result.succeeded):      
       execute(schedule_downtime, env['host_string'])
-      execute(force_reboot)
+      # we need to ensure we only execute this task on the current
+      # host we're operating on, not every host in env.hosts
+      execute(force_reboot, hosts=[env['host_string']])
 
 @task
 def force_reboot():
