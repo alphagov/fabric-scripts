@@ -10,7 +10,6 @@ def security_updates():
     """Show outstading security updates"""
     run("/usr/local/bin/govuk_check_security_upgrades --human-readable")
 
-
 @task
 def upgrade():
     """Upgrade packages with apt-get"""
@@ -42,3 +41,13 @@ def packages_with_reboots(*args):
 def reset_reboot_needed(*args):
     """Delete the flag file that triggers the 'reboot required by apt' Nagios check"""
     sudo('rm -f /var/run/reboot-required')
+
+@task
+def autoremove():
+    """Run `apt-get autoremove`"""
+    sudo('apt-get autoremove')
+
+@task
+def autoremove_dry_run():
+    """Run `apt-get autoremove` dry run"""
+    sudo('apt-get autoremove --dry-run')
