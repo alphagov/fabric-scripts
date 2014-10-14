@@ -46,3 +46,8 @@ def reset_reboot_needed(*args):
 def autoremove():
     """Run `apt-get autoremove`"""
     sudo('apt-get autoremove')
+
+@task
+def autoremove_dry_run():
+    """Run `apt-get autoremove` dry run"""
+    sudo('apt-get autoremove --dry-run')
