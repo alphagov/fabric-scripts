@@ -29,4 +29,4 @@ def safe_reboot():
     health = json.loads(cluster_health())
     if (health['status'] != 'green'):
         abort("Cluster health is %s, won't reboot" % health['status'])
-    execute(vm.reboot)
+    execute(vm.reboot, hosts=[env['host_string']])
