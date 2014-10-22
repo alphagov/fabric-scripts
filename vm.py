@@ -1,4 +1,5 @@
 from fabric.api import *
+import re
 
 @task
 def uptime():
@@ -19,6 +20,20 @@ def disk():
 def os_version():
     """Show operating system"""
     run('facter lsbdistcodename lsbdistdescription operatingsystem operatingsystemrelease')
+
+@task
+def deprecated_library(name):
+    """
+    Find processes that are using a deprecated library and need restarting
+
+    For example:
+      - Processes using a non-upgraded version of libssl:
+        vm.deprecated_library:libssl
+
+      - Processes that are using any deleted/upgraded library:
+        vm.deprecated_library:/lib
+    """
+    sudo("lsof -d DEL | awk '$8 ~ /{0}/'".format(re.escape(name)))
 
 @task
 def stopped_jobs():
