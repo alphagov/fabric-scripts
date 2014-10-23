@@ -30,3 +30,13 @@ def safe_reboot():
     if (health['status'] != 'green'):
         abort("Cluster health is %s, won't reboot" % health['status'])
     execute(vm.reboot, hosts=[env['host_string']])
+
+
+@task
+@serial
+@runs_once
+def redis_safe_reboot():
+    """Reboot only if no logs in queue"""
+    log_length = run('redis-cli llen logs')
+    if log_length == '(integer) 0':
+        execute(vm.reboot, hosts=[env['host_string']])
