@@ -38,7 +38,7 @@ def schedule_downtime(host,minutes='20'):
 
     host = _nagios_hostname(host)
 
-    command = "SCHEDULE_HOST_DOWNTIME;%(host)s;%(now)d;%(end)d;1;0;%(duration)d;fabric;fabric" % {
+    command = "SCHEDULE_HOST_SVC_DOWNTIME;%(host)s;%(now)d;%(end)d;1;0;%(duration)d;fabric;fabric" % {
         'now': timestamp,
         'host': host,
         'end': timestamp + seconds,
