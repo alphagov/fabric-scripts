@@ -8,8 +8,8 @@ import textwrap
 import time
 
 from fabric import state
-from fabric.api import (abort, env, get, hide, local, puts, run, runs_once,
-                        serial, settings, sudo, task, warn)
+from fabric.api import (abort, env, get, hide, hosts, local, puts, run,
+                        runs_once, serial, settings, sudo, task, warn)
 from fabric.task_utils import crawl
 
 # Our command submodules
@@ -102,6 +102,15 @@ class RoleFetcher(object):
             self.vdcs.add(vdc)
 
         self.fetched = True
+
+    def fetch_puppet_class(self, name):
+        # These cannot be prefetched because there's too many variations.
+        # But we only need to fetch once for each.
+        if self.roledefs['puppet_class-%s' % name]:
+            return
+
+        hosts = _fetch_hosts('-C %s' % name)
+        self.roledefs['puppet_class-%s' % name] = hosts
 
     def __contains__(self, key):
         return True
@@ -235,12 +244,11 @@ def klass(class_name):
     env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 @task
+@hosts('localhost')
 def puppet_class(class_name):
     """Select all machines which include a given puppet class"""
-    hosts = _fetch_hosts('-C %s' % class_name)
-    if (hosts == []):
-        abort("Didn't find any hosts with class %s" % class_name)
-    env.hosts.extend(sorted(hosts))
+    env.roledefs.fetch_puppet_class(class_name)
+    env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
 
 @task
 def vdc(vdc_name):
