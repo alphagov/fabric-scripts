@@ -24,6 +24,7 @@ import kernel
 import licensify
 import logstream
 import mongo
+import mainstream_slugs
 import mysql
 import nagios
 import nginx
