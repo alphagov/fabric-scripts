@@ -37,6 +37,20 @@ And execute against an environment and set of hosts like so:
     $ fab preview class:frontend do:'uname -a'
     ...
 
+### Targetting groups of machines
+
+Fabric tasks can be run on groups of machines in a variety of different ways.
+
+by puppet class
+
+    # target all machines that have the 'govuk::safe_to_reboot::yes' class
+    $ fab preview puppet_class:govuk::safe_to_reboot::yes do:'uname -a'
+
+by numeric machine suffix
+
+    # target all machines that end in '2'
+    $ fab preview numbered:2 do:'uname -a'
+
 ## Remote usage (legacy)
 
 It was previously possible to use these scripts from the jumpboxes via the
