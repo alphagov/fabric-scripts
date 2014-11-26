@@ -252,6 +252,13 @@ def puppet_class(class_name):
     env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
 
 @task
+@hosts('localhost')
+def node_type(node_name):
+    """Select all machines of a given node type"""
+    class_name = 'govuk::node::s_{}'.format(node_name.replace('-', '_'))
+    puppet_class(class_name)
+    
+@task
 def vdc(vdc_name):
     """Select a virtual datacentre"""
     env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
