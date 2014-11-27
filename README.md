@@ -51,6 +51,11 @@ by numeric machine suffix
     # target all machines that end in '2'
     $ fab preview numbered:2 do:'uname -a'
 
+by node type (as defined in puppet)
+
+    # target all 'frontend' machines
+    $ fab preview node_type:frontend do:'uname -a'
+
 ## Remote usage (legacy)
 
 It was previously possible to use these scripts from the jumpboxes via the
