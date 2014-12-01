@@ -1,5 +1,6 @@
 from fabric import api
 
+import csv
 import glob
 import os
 import re
@@ -23,6 +24,10 @@ def prepare(output_directory, source_topic, destination_topic):
     The CSV files are then downloaded to the local directory specified.
 
     """
+    do_prepare(output_directory, source_topic, destination_topic)
+
+
+def do_prepare(output_directory, source_topic, destination_topic):
     if not os.path.isdir(output_directory):
         os.makedirs(output_directory)
     prepare_publisher_csv(output_directory, source_topic, destination_topic)
@@ -41,6 +46,10 @@ def process(file_pattern):
            to process.
 
     """
+    do_process(file_pattern)
+
+
+def do_process(file_pattern):
     paths_by_app = {}
     for path in glob.glob(file_pattern):
         app = os.path.basename(path).split("_")[0]
@@ -51,6 +60,80 @@ def process(file_pattern):
     if paths_by_app:
         print "WARNING: Ignoring files for unknown apps: %s" % (
             ', '.join(paths_by_app.keys()))
+
+
+@api.task
+def move_in_panopticon(source_topic, destination_topic):
+    """Move content tagged in panopticon
+
+    """
+    do_move_in_panopticon(source_topic, destination_topic)
+
+def do_move_in_panopticon(source_topic, destination_topic):
+    util.use_random_host('class-backend')
+    print("\nRetagging content on %s" % (api.env.host_string,))
+    util.rake('panopticon', 'move_content_to_new_topic',
+              source=source_topic, dest=destination_topic)
+
+
+@api.task
+def delete_topic(old_topic):
+    """Delete a topic, causing it to return a 410 gone status.
+
+    """
+    do_delete_topic(old_topic)
+
+def do_delete_topic(old_topic):
+    util.use_random_host('class-backend')
+    print("\nDeleting old topic %s" % (old_topic,))
+    util.rake('panopticon', 'specialist_sector_cleanup', SLUG=old_topic)
+
+
+@api.task
+def move_topics(csv_filename, output_directory, action="all"):
+    """Apply a set of topic changes from a CSV.
+
+    This takes a CSV which maps from old topic slug to new topic slug, and
+    coordinates running all the changes.
+
+    """
+    topic_slug_changes = read_topic_slug_changes(csv_filename)
+    action = action.lower()
+
+    if action in ["all", "prepare"]:
+        if os.path.exists(output_directory):
+            print "Output directory already exists"
+            print "Aborting, to avoid risk of pulling in unexpected changes."
+            exit(1)
+        os.makedirs(output_directory)
+        for old_slug, new_slug in topic_slug_changes.items():
+            do_prepare(output_directory, old_slug, new_slug)
+
+    if action in ["all", "process"]:
+        do_process(output_directory + "/*.csv")
+
+    if action in ["all", "panopticon"]:
+        for old_slug, new_slug in topic_slug_changes.items():
+            move_in_panopticon(old_slug, new_slug)
+
+    if action in ["all", "delete"]:
+        for old_slug in topic_slug_changes.keys():
+            delete_topic(old_slug)
+
+
+def read_topic_slug_changes(csv_filename):
+    changes = {}
+    with open(csv_filename) as fobj:
+        reader = csv.reader(fobj)
+        headings = [
+            heading.lower().strip().replace(' ', '_')
+            for heading in reader.next()
+        ]
+        old_index = headings.index('old_topic_slug')
+        new_index = headings.index('new_topic_slug')
+        for row in reader:
+            changes[row[old_index]] = row[new_index]
+    return changes
 
 
 def slugify(topic):
@@ -68,7 +151,7 @@ def build_filename(app, source_topic, destination_topic):
 
 def prepare_publisher_csv(output_directory, source_topic, destination_topic):
     util.use_random_host('class-backend')
-    print("Fetching publisher change CSV from %s" % (api.env.host_string,))
+    print("\nFetching publisher change CSV from %s" % (api.env.host_string,))
 
     filename = build_filename('publisher', source_topic, destination_topic)
     remote_path = '/var/apps/publisher/tmp/%s' % (filename,)
@@ -82,7 +165,7 @@ def prepare_publisher_csv(output_directory, source_topic, destination_topic):
 
 def prepare_whitehall_csv(output_directory, source_topic, destination_topic):
     util.use_random_host('class-whitehall_backend')
-    print("Fetching whitehall change CSV from %s" % (api.env.host_string,))
+    print("\nFetching whitehall change CSV from %s" % (api.env.host_string,))
 
     filename = build_filename('whitehall', source_topic, destination_topic)
     remote_path = '/var/apps/whitehall/tmp/%s' % (filename,)
@@ -103,15 +186,23 @@ def process_publisher_csvs(paths):
 
 def process_publisher_csv(path):
     filename = os.path.basename(path)
-    print("Applying publisher change CSV %s on %s" % (
+    print("\nApplying publisher change CSV %s on %s" % (
         filename,
         api.env.host_string,
     ))
+    if file_length(path) == 1:
+        print("No changes in file - skipping")
+        return
 
     remote_path = '/var/apps/publisher/tmp/%s' % (filename, )
     api.put(path, remote_path, use_sudo=True)
     util.rake('publisher', 'topic_changes:process', remote_path)
     api.sudo("rm '%s'" % (remote_path,))
+
+
+def file_length(path):
+    with open(path) as fobj:
+        return len(fobj.readlines())
 
 
 def process_whitehall_csvs(paths):
@@ -122,10 +213,13 @@ def process_whitehall_csvs(paths):
 
 def process_whitehall_csv(path):
     filename = os.path.basename(path)
-    print("Applying whitehall change CSV %s on %s" % (
+    print("\nApplying whitehall change CSV %s on %s" % (
         filename,
         api.env.host_string,
     ))
+    if file_length(path) == 1:
+        print("No changes in file - skipping")
+        return
 
     remote_path = '/var/apps/whitehall/tmp/%s' % (filename, )
     api.put(path, remote_path, use_sudo=True)
