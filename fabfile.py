@@ -33,6 +33,7 @@ import puppet
 import rkhunter
 import search
 import statsd
+import topic_change
 import vm
 import whitehall
 
