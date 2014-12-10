@@ -7,7 +7,7 @@ def updates():
 
 @task
 def security_updates():
-    """Show outstading security updates"""
+    """Show outstanding security updates"""
     run("/usr/local/bin/govuk_check_security_upgrades --human-readable")
 
 @task
