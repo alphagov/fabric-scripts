@@ -1,5 +1,5 @@
 from fabric.api import *
-
+from fabric.decorators import serial
 
 @task
 def restart(app):
@@ -18,6 +18,14 @@ def start(app):
     """Start a particular app"""
     _service(app, 'start')
 
+
+@task
+@serial
+@with_settings(warn_only=False)
+def rolling_stop_start(app):
+    """Perform a sequential forced reload of an app that stops at first failure"""
+    stop(app)
+    start(app)
 
 def _service(app, command):
     sudo('service {} {}'.format(app, command))
