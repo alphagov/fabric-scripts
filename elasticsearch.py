@@ -18,7 +18,7 @@ def status(index):
 
 @task
 def cluster_health():
-    """Get the status of an index"""
+    """Get cluster status"""
     return run("curl -XGET 'http://localhost:9200/_cluster/health'")
 
 @task
