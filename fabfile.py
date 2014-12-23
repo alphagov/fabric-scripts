@@ -19,6 +19,7 @@ import cache
 import campaigns
 import cdn
 import elasticsearch
+import graphite
 import incident
 import kernel
 import licensify
