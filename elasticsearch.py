@@ -22,6 +22,11 @@ def cluster_health():
     return run("curl -XGET 'http://localhost:9200/_cluster/health?pretty'")
 
 @task
+def cluster_nodes():
+    """Get cluster nodes"""
+    return run("curl -XGET 'http://localhost:9200/_cluster/nodes?pretty'")
+
+@task
 @serial
 @runs_once
 def safe_reboot():
