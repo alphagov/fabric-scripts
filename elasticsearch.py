@@ -19,7 +19,7 @@ def status(index):
 @task
 def cluster_health():
     """Get cluster status"""
-    return run("curl -XGET 'http://localhost:9200/_cluster/health'")
+    return run("curl -XGET 'http://localhost:9200/_cluster/health?pretty'")
 
 @task
 @serial
