@@ -30,7 +30,7 @@ def check_disabled():
     lockfile = '/var/lib/puppet/state/agent_disabled.lock'
 
     with hide('running'):
-        run('test -f {0} && echo DISABLED || echo ENABLED'.format(lockfile))
+        sudo('test -f {0} && echo DISABLED || echo ENABLED'.format(lockfile))
 
 @task
 def dryrun(*args):
