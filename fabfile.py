@@ -31,6 +31,7 @@ import nagios
 import nginx
 import ntp
 import puppet
+import rabbitmq
 import rkhunter
 import search
 import statsd
