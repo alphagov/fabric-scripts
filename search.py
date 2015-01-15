@@ -13,7 +13,7 @@ SEARCHABLE_APPS = {
     'smartanswers':          ('frontend', ['panopticon:register']),
     'tariff':                ('frontend', ['panopticon:register']),
     'travel-advice-publisher':('backend', ['panopticon:register', 'panopticon:reregister_editions']),
-    'whitehall':             ('backend',  ['rummager:index']),
+    'whitehall':             ('whitehall_backend',  ['rummager:index']),
 }
 
 @task
