@@ -249,6 +249,7 @@ def klass(class_name):
     env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 @task
+@serial
 @hosts('localhost')
 def puppet_class(class_name):
     """Select all machines which include a given puppet class"""
