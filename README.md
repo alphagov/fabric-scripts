@@ -56,6 +56,11 @@ by node type (as defined in puppet)
     # target all 'frontend' machines
     $ fab preview node_type:frontend do:'uname -a'
 
+by the node name
+
+    # target just one node
+    $ fab production -H backend-3.backend do:'uname -a'
+
 ## Remote usage (legacy)
 
 It was previously possible to use these scripts from the jumpboxes via the
