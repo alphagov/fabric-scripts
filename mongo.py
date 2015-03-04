@@ -14,8 +14,10 @@ def strip_dates(raw_output):
     stripped_isodates = re.sub(r'ISODate\((.*?)\)', r'\1', raw_output)
     return re.sub(r'Timestamp\((.*?)\)', r'"\1"', stripped_isodates)
 
+
 def mongo_command(command):
     return "mongo --quiet --eval 'printjson(%s)'" % command
+
 
 def run_mongo_command(command):
     response = run(mongo_command(command))
@@ -25,11 +27,12 @@ def run_mongo_command(command):
     except ValueError:
         print response
 
+
 @task(default=True)
 @roles('class-mongo')
 def replsetlogs(*args):
     """Grep the mongod logs for replSet today"""
-    sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today )
+    sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today)
 
 @task
 def find_primary():
