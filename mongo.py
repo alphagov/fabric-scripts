@@ -34,23 +34,27 @@ def replsetlogs(*args):
     """Grep the mongod logs for replSet today"""
     sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today)
 
-@task
-def find_primary():
-    """Find which mongo node is the master"""
-    with hide('output'):
+
+def _find_primary():
+    with hide('output', 'running'):
         config = run_mongo_command("rs.isMaster()")
         out = None
         if 'primary' in config:
             out = node_name(config['primary']).split(':')[0]
         else:
             out = "No primary currently elected."
-        print(out)
         return out
+
+
+@task
+def find_primary():
+    """Find which mongo node is the master"""
+    print(_find_primary())
 
 
 def i_am_primary(primary=None):
     if primary is None:
-        primary = find_primary()
+        primary = _find_primary()
     if primary == 'No primary currently elected.':
         return False
 
@@ -69,24 +73,48 @@ def i_am_primary(primary=None):
     return False
 
 
-@task
-def status():
-    """Check the status of the mongo cluster"""
-    with hide('output'):
-        status = run_mongo_command("rs.status()")
-        print("Status at %s" % status['date'])
+def get_cluster_status():
+    with hide('everything'):
+        status = run_mongo_command('rs.status()')
         parsed_statuses = []
-        parsed_statuses.append(['Name', 'Health', 'State', 'Heartbeat'])
 
         for member_status in status['members']:
             name = node_name(member_status['name'])
             health = "OK" if member_status['health'] == 1 else "ERROR"
             state = member_status['stateStr']
             heartbeat = member_status.get('lastHeartbeat', '')
-            parsed_statuses.append([name, health, state, heartbeat])
+            parsed_status = {'name': name,
+                             'health': health,
+                             'state': state,
+                             'heartbeat': heartbeat}
+            parsed_statuses.append(parsed_status)
 
-        for status in parsed_statuses:
-            print("| {0:<22} | {1:<8} | {2:<10} | {3:<22} |".format(status[0], status[1], status[2], status[3]))
+        return parsed_statuses
+
+
+def cluster_is_ok():
+    member_statuses = get_cluster_status()
+    health_ok = all(s['health'] == 'OK' for s in member_statuses)
+    state_ok = all(s['state'] in ['PRIMARY', 'SECONDARY']
+                   for s in member_statuses)
+    one_primary = len([s for s in member_statuses
+                       if s['state'] == 'PRIMARY']) == 1
+
+    return health_ok and state_ok and one_primary
+
+
+@task
+def status():
+    """Check the status of the mongo cluster"""
+    
+    member_statuses = get_cluster_status()
+    format_string = "| {0:<22} | {1:<8} | {2:<10} | {3:<22} |"
+    print(format_string.format('Name', 'Health', 'State', 'Heartbeat'))
+    for status in member_statuses:
+        print(format_string.format(status['name'],
+                                   status['health'],
+                                   status['state'],
+                                   status['heartbeat']))
 
 
 @task
@@ -109,15 +137,19 @@ def step_down_primary(seconds='100'):
 def safe_reboot():
     """Reboot a mongo machine, stepping down if it is the primary"""
     import vm
-    primary = find_primary()
+    primary = _find_primary()
     if primary == 'No primary currently elected':
         return primary
 
+    if i_am_primary(primary):
+        execute(step_down_primary)
+
     for i in range(5):
-        if i_am_primary(primary):
-            if i == 0:
-                execute(step_down_primary, primary)
-            else:
-                sleep(1)
+        if cluster_is_ok() and not i_am_primary():
+            break
+        sleep(1)
+
+    if not cluster_is_ok() or i_am_primary():
+        abort("Cluster has not recovered")
 
     execute(vm.reboot, hosts=[env['host_string']])
