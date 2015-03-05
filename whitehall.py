@@ -13,12 +13,15 @@ def dedupe_stats_announcement_from_file(filename):
 
 @task
 @hosts('whitehall-backend-1.backend')
-def dedupe_stats_announcement(duplicate_slug, authoritative_slug):
+def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
     """De-duplicate Whitehall statistics announcement"""
-    command = 'govuk_setenv whitehall ./script/dedupe_stats_announcement {} {}'
+    noop = bool(noop)
+    command = 'govuk_setenv whitehall ./script/dedupe_stats_announcement'
+    if noop:
+        command += ' -n'
+    command += ' {} {}'.format(duplicate_slug, authoritative_slug)
     with cd('/var/apps/whitehall'):
-        sudo(command.format(duplicate_slug, authoritative_slug),
-             user='deploy')
+        sudo(command, user='deploy')
 
 
 @task
