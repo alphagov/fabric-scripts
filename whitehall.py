@@ -19,3 +19,13 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug):
     with cd('/var/apps/whitehall'):
         sudo(command.format(duplicate_slug, authoritative_slug),
              user='deploy')
+
+
+@task
+@hosts('whitehall-backend-1.backend')
+def unarchive_content(*edition_ids):
+    """Unarchive Whitehall content"""
+    command = 'govuk_setenv whitehall bundle exec rake unarchive_edition[{}]'
+    with cd('/var/apps/whitehall'):
+        for edition_id in edition_ids:
+            sudo(command.format(edition_id), user='deploy')
