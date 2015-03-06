@@ -48,6 +48,16 @@ def schedule_publications():
     _run_whitehall_rake('publishing:overdue:publish')
 
 
+@task
+@runs_once
+@roles('class-whitehall_backend')
+def unpublish_statistics_announcement(*slugs):
+    """Unpublish statistics announcements and register 410 GONE routes"""
+    for slug in slugs:
+        _run_whitehall_rake(
+            'unpublish_statistics_announcement[{}]'.format(slug))
+
+
 def _run_whitehall_rake(task):
     _run_whitehall_command('rake {}'.format(task))
 
