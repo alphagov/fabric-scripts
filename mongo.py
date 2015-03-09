@@ -10,6 +10,7 @@ import puppet
 
 today = date.today().strftime("%a %b %d")
 
+
 def node_name(node_name):
     return node_name.split('.production').pop(0)
 
@@ -86,7 +87,7 @@ def i_am_primary(primary=None):
     backend_re = re.compile(r'^backend-(\d+).mongo$')
     if primary == env['host_string']:
         return True
-    elif env['host_string'].split('.')[0] == primary.split('.')[0]: 
+    elif env['host_string'].split('.')[0] == primary.split('.')[0]:
         # lol licensify-mongo-n.licensify
         return True
     elif backend_re.match(primary):
@@ -166,8 +167,9 @@ def status():
 @task
 def step_down_primary(seconds='100'):
     """Step down as primary for a given number of seconds (default: 100)"""
-    # Mongo returns an exit code of 252 when the primary steps down, as well as disconnecting
-    # the current console session. We need to mark that as okay so that run() won't error.
+    # Mongo returns an exit code of 252 when the primary steps down, as well
+    # as disconnecting the current console session. We need to mark that as
+    # okay so that run() won't error.
     with hide('output'), settings(ok_ret_codes=[0, 252]):
         if i_am_primary():
             run_mongo_command("rs.stepDown(%s)" % seconds)
