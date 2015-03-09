@@ -5,6 +5,8 @@ from datetime import date
 from time import sleep
 import json
 import re
+import app
+import puppet
 
 today = date.today().strftime("%a %b %d")
 
@@ -39,6 +41,23 @@ def run_mongo_command(command):
 def replsetlogs(*args):
     """Grep the mongod logs for replSet today"""
     sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today)
+
+
+@task
+def force_resync():
+    """Force a mongo secondary to resync by removing all it's data."""
+    if i_am_primary():
+        abort(colors.red("Refusing to force resync on primary", bold=True))
+
+    execute(puppet.disable, "Forcing mongodb resync")
+    execute(app.stop, "mongodb")
+    # wait for mongod process to stop
+    while run("ps -C mongod", quiet=True).return_code == 0:
+        puts("Waiting for mongod to stop")
+        sleep(1)
+    sudo("rm -rf /var/lib/mongodb/*")
+    execute(app.start, "mongodb")
+    execute(puppet.enable)
 
 
 def _find_primary():
