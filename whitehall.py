@@ -1,4 +1,5 @@
-from fabric.api import task, sudo, cd, execute, runs_once, roles
+from fabric.api import task, execute, runs_once, roles
+import util
 
 
 @task
@@ -20,7 +21,7 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
     command = './script/dedupe_stats_announcement{} {} {}'.format(
         option, duplicate_slug, authoritative_slug)
 
-    _run_whitehall_command(command)
+    util.bundle_exec('whitehall', command)
 
 
 @task
@@ -29,7 +30,7 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
 def unarchive_content(*edition_ids):
     """Unarchive Whitehall content"""
     for edition_id in edition_ids:
-        _run_whitehall_rake('unarchive_edition[{}]'.format(edition_id))
+        util.rake('whitehall', 'unarchive_editions', edition_id)
 
 
 @task
@@ -37,7 +38,7 @@ def unarchive_content(*edition_ids):
 @roles('class-whitehall_backend')
 def overdue_scheduled_publications():
     """List overdue scheduled publications"""
-    _run_whitehall_rake('publishing:overdue:list')
+    util.rake('whitehall', 'publishing:overdue:list')
 
 
 @task
@@ -45,7 +46,7 @@ def overdue_scheduled_publications():
 @roles('class-whitehall_backend')
 def schedule_publications():
     """Publish overdue scheduled publications"""
-    _run_whitehall_rake('publishing:overdue:publish')
+    util.rake('whitehall', 'publishing:overdue:publish')
 
 
 @task
@@ -54,15 +55,4 @@ def schedule_publications():
 def unpublish_statistics_announcement(*slugs):
     """Unpublish statistics announcements and register 410 GONE routes"""
     for slug in slugs:
-        _run_whitehall_rake(
-            'unpublish_statistics_announcement[{}]'.format(slug))
-
-
-def _run_whitehall_rake(task):
-    _run_whitehall_command('rake {}'.format(task))
-
-
-def _run_whitehall_command(command):
-    with cd('/var/apps/whitehall'):
-        sudo('govuk_setenv whitehall bundle exec {}'.format(command),
-             user='deploy')
+        util.rake('whitehall', 'unpublish_statistics_announcement', slug)
