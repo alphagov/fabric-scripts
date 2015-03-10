@@ -31,5 +31,11 @@ def start(app):
     _service(app, 'start')
 
 
+@task
+def status(app):
+    """Check status of a particular app"""
+    _service(app, 'status')
+
+
 def _service(app, command):
     sudo('service {} {}'.format(app, command))
