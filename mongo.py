@@ -1,14 +1,23 @@
-from fabric.api import *
+from fabric.api import task, roles, runs_once
+from fabric.api import run, sudo, hide, settings, abort, execute, puts, env
 from fabric import colors
-from datetime import *
+from datetime import date
 from time import sleep
 import json
 import re
+import app
+import puppet
 
 today = date.today().strftime("%a %b %d")
 
+
 def node_name(node_name):
     return node_name.split('.production').pop(0)
+
+
+def node_health(health_code):
+    return "OK" if health_code == 1 else "ERROR"
+
 
 def strip_dates(raw_output):
     stripped_isodates = re.sub(r'ISODate\((.*?)\)', r'\1', raw_output)
@@ -16,11 +25,11 @@ def strip_dates(raw_output):
 
 
 def mongo_command(command):
-    return "mongo --quiet --eval 'printjson(%s)'" % command
+    return "mongo --quiet --eval '%s'" % command
 
 
 def run_mongo_command(command):
-    response = run(mongo_command(command))
+    response = run(mongo_command('printjson(%s)' % command))
 
     try:
         return json.loads(strip_dates(response))
@@ -33,6 +42,23 @@ def run_mongo_command(command):
 def replsetlogs(*args):
     """Grep the mongod logs for replSet today"""
     sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today)
+
+
+@task
+def force_resync():
+    """Force a mongo secondary to resync by removing all it's data."""
+    if i_am_primary():
+        abort(colors.red("Refusing to force resync on primary", bold=True))
+
+    execute(puppet.disable, "Forcing mongodb resync")
+    execute(app.stop, "mongodb")
+    # wait for mongod process to stop
+    while run("ps -C mongod", quiet=True).return_code == 0:
+        puts("Waiting for mongod to stop")
+        sleep(1)
+    sudo("rm -rf /var/lib/mongodb/*")
+    execute(app.start, "mongodb")
+    execute(puppet.enable)
 
 
 def _find_primary():
@@ -61,7 +87,7 @@ def i_am_primary(primary=None):
     backend_re = re.compile(r'^backend-(\d+).mongo$')
     if primary == env['host_string']:
         return True
-    elif env['host_string'].split('.')[0] == primary.split('.')[0]: 
+    elif env['host_string'].split('.')[0] == primary.split('.')[0]:
         # lol licensify-mongo-n.licensify
         return True
     elif backend_re.match(primary):
@@ -79,14 +105,18 @@ def get_cluster_status():
         parsed_statuses = []
 
         for member_status in status['members']:
-            name = node_name(member_status['name'])
-            health = "OK" if member_status['health'] == 1 else "ERROR"
-            state = member_status['stateStr']
-            heartbeat = member_status.get('lastHeartbeat', '')
-            parsed_status = {'name': name,
-                             'health': health,
-                             'state': state,
-                             'heartbeat': heartbeat}
+            parsed_status = {
+                'name': node_name(member_status['name']),
+                'health': node_health(member_status['health']),
+                'state': member_status['stateStr'],
+            }
+            keys = [
+                'uptime', 'optime', 'optimeDate',
+                'lastHeartbeat', 'lastHeartbeatRecv',
+                'lastHeartbeatMessage',
+            ]
+            for key in keys:
+                parsed_status[key] = member_status.get(key, '')
             parsed_statuses.append(parsed_status)
 
         return parsed_statuses
@@ -104,24 +134,42 @@ def cluster_is_ok():
 
 
 @task
+@runs_once
+@roles('class-mongo')
 def status():
     """Check the status of the mongo cluster"""
-    
-    member_statuses = get_cluster_status()
-    format_string = "| {0:<22} | {1:<8} | {2:<10} | {3:<22} |"
-    print(format_string.format('Name', 'Health', 'State', 'Heartbeat'))
-    for status in member_statuses:
-        print(format_string.format(status['name'],
-                                   status['health'],
-                                   status['state'],
-                                   status['heartbeat']))
+    with hide('output'), settings(host_string=_find_primary()):
+        print(colors.blue(
+            "Primary replication info - db.printReplicationInfo()",
+            bold=True))
+        print(run(mongo_command("db.printReplicationInfo()")))
+
+        print(colors.blue(
+            "Slave replication info - db.printSlaveReplicationInfo()",
+            bold=True))
+        print(run(mongo_command("db.printSlaveReplicationInfo()")))
+
+        print(colors.blue(
+            "Replication status - rs.status()",
+            bold=True))
+        for status in get_cluster_status():
+            print(colors.cyan(
+                "{} - {}".format(status['name'], status['state'])))
+
+            keys = ['health', 'uptime', 'optime', 'optimeDate',
+                    'lastHeartbeat', 'lastHeartbeatRecv',
+                    'lastHeartbeatMessage']
+            for key in keys:
+                if status[key]:
+                    print("{0:<22} {1}".format(key, status[key]))
 
 
 @task
 def step_down_primary(seconds='100'):
     """Step down as primary for a given number of seconds (default: 100)"""
-    # Mongo returns an exit code of 252 when the primary steps down, as well as disconnecting
-    # the current console session. We need to mark that as okay so that run() won't error.
+    # Mongo returns an exit code of 252 when the primary steps down, as well
+    # as disconnecting the current console session. We need to mark that as
+    # okay so that run() won't error.
     with hide('output'), settings(ok_ret_codes=[0, 252]):
         if i_am_primary():
             run_mongo_command("rs.stepDown(%s)" % seconds)
