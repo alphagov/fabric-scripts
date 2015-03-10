@@ -1,4 +1,4 @@
-from fabric.api import task, hosts, sudo, cd, execute
+from fabric.api import task, sudo, cd, execute, runs_once, roles
 
 
 @task
@@ -12,23 +12,47 @@ def dedupe_stats_announcement_from_file(filename):
 
 
 @task
-@hosts('whitehall-backend-1.backend')
+@runs_once
+@roles('class-whitehall_backend')
 def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
     """De-duplicate Whitehall statistics announcement"""
-    noop = bool(noop)
-    command = 'govuk_setenv whitehall ./script/dedupe_stats_announcement'
-    if noop:
-        command += ' -n'
-    command += ' {} {}'.format(duplicate_slug, authoritative_slug)
-    with cd('/var/apps/whitehall'):
-        sudo(command, user='deploy')
+    option = ' -n' if noop else ''
+    command = './script/dedupe_stats_announcement{} {} {}'.format(
+        option, duplicate_slug, authoritative_slug)
+
+    _run_whitehall_command(command)
 
 
 @task
-@hosts('whitehall-backend-1.backend')
+@runs_once
+@roles('class-whitehall_backend')
 def unarchive_content(*edition_ids):
     """Unarchive Whitehall content"""
-    command = 'govuk_setenv whitehall bundle exec rake unarchive_edition[{}]'
+    for edition_id in edition_ids:
+        _run_whitehall_rake('unarchive_edition[{}]'.format(edition_id))
+
+
+@task
+@runs_once
+@roles('class-whitehall_backend')
+def overdue_scheduled_publications():
+    """List overdue scheduled publications"""
+    _run_whitehall_rake('publishing:overdue:list')
+
+
+@task
+@runs_once
+@roles('class-whitehall_backend')
+def schedule_publications():
+    """Publish overdue scheduled publications"""
+    _run_whitehall_rake('publishing:overdue:publish')
+
+
+def _run_whitehall_rake(task):
+    _run_whitehall_command('rake {}'.format(task))
+
+
+def _run_whitehall_command(command):
     with cd('/var/apps/whitehall'):
-        for edition_id in edition_ids:
-            sudo(command.format(edition_id), user='deploy')
+        sudo('govuk_setenv whitehall bundle exec {}'.format(command),
+             user='deploy')
