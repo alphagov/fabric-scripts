@@ -133,7 +133,6 @@ def cluster_is_ok():
 
 @task
 @runs_once
-@roles('class-mongo')
 def status():
     """Check the status of the mongo cluster"""
     with hide('output'), settings(host_string=_find_primary()):
