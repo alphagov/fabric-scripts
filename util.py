@@ -47,13 +47,13 @@ def command(app, cmd, **params):
         _validate_strings("environment variable name",
                           params.keys(), pattern=r"^[A-Z_][A-Z_0-9]*$")
         _validate_strings("environment variable value",
-                          params.values(), pattern=r"^[^']*$")
+                          params.values(), bad_chars="'")
         env_vars = ' '.join(
             "{}='{}'".format(name, value)
-            for (name, value) in params.items()) + ' '
+            for (name, value) in params.items())
 
     with cd('/var/apps/{}'.format(app)):
-        sudo("{}govuk_setenv '{}' {}".format(env_vars, app, cmd),
+        sudo("{} govuk_setenv '{}' {}".format(env_vars, app, cmd),
              user='deploy')
 
 
