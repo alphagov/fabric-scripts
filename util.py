@@ -24,7 +24,7 @@ def rake(app, task, *args, **params):
                           args, bad_chars=",]'")
         task = "{}[{}]".format(task, ','.join(args))
 
-    bundle_exec(app, task, **params)
+    bundle_exec(app, "rake " + task, **params)
 
 
 def bundle_exec(app, cmd, **params):
