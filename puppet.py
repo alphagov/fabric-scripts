@@ -36,3 +36,11 @@ def check_disabled():
 def dryrun(*args):
     """Run puppet agent but make no changes to the system"""
     puppet('--noop', *args)
+
+@task
+@hosts('puppetmaster-1.management')
+def lookup_hieradata(key):
+    puppet_directory = '/usr/share/puppet/production/current'
+    config_file = '{0}/hiera.yml'.format(puppet_directory)
+    variables = '::environment=production ::lsbdistcodename=precise ::settings::manifestdir={0}/manifests'.format(puppet_directory)
+    run('hiera --config {0} {1} {2}'.format(config_file, key, variables))
