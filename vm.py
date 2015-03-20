@@ -70,6 +70,14 @@ def reload_unicorn(name):
     """
     sudo('sudo initctl start %s 2>/dev/null || sudo initctl reload %s' % (name, name))
 
+def reboot_required():
+    """
+    Check whether a reboot is required
+
+    """
+    result = run("/usr/local/bin/check_reboot_required 30 0", warn_only=True)
+    return (not result.succeeded)
+
 @task
 def reboot():
   """Schedule a host for downtime in nagios and reboot (if required)
@@ -77,10 +85,7 @@ def reboot():
   Usage:
   fab production -H frontend-1.frontend.production vm.reboot
   """
-  from nagios import schedule_downtime
-  result = run("/usr/local/bin/check_reboot_required 30 0", warn_only=True)
-  if (not result.succeeded):      
-      execute(schedule_downtime, env['host_string'])
+  if reboot_required():
       # we need to ensure we only execute this task on the current
       # host we're operating on, not every host in env.hosts
       execute(force_reboot, hosts=[env['host_string']])
@@ -88,6 +93,8 @@ def reboot():
 @task
 def force_reboot():
   """Schedule a host for downtime in nagios and force reboot (even if not required)"""
+  from nagios import schedule_downtime
+  execute(schedule_downtime, env['host_string'])
   run("sudo shutdown -r now")
 
 @task
