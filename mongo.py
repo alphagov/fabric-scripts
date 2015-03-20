@@ -182,6 +182,16 @@ def step_down_primary(seconds='100'):
 def safe_reboot():
     """Reboot a mongo machine, stepping down if it is the primary"""
     import vm
+    if not vm.reboot_required():
+        print("No reboot required")
+        return
+
+    while True:
+        if cluster_is_ok():
+            break
+        sleep(5)
+        print("Waiting for cluster to be okay")
+
     primary = _find_primary()
     if primary == 'No primary currently elected':
         return primary
