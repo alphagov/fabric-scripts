@@ -107,3 +107,22 @@ def poweroff():
   from nagios import schedule_downtime
   execute(schedule_downtime, env['host_string'])
   run("sudo poweroff")
+
+@task
+@hosts('puppetmaster-1.management')
+def host_key(hostname):
+  """
+  Check the SSH host key of a machine. This task runs on the Puppetmaster because
+  it's the only machine that knows about all host keys.
+
+  Usage:
+  fab production vm.host_key:backend-1.backend
+  """
+  with hide('running', 'stdout'):
+    ssh_key = run("grep {0} /etc/ssh/ssh_known_hosts | head -1".format(hostname))
+
+  if ssh_key == '':
+    print 'Machine {0} not found in ssh_known_hosts file'.format(hostname)
+  else:
+    with hide('running'):
+      run("ssh-keygen -l -f /dev/stdin <<< '{0}'".format(ssh_key))
