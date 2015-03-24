@@ -85,6 +85,9 @@ def safe_reboot():
     try:
         execute(vm.reboot, hosts=[env['host_string']])
 
+        # Give the reboot time to start, before we check for the status again.
+        sleep(10)
+
         # Status won't usually go back to green while reallocation is turned off,
         # but should go to yellow.
         wait_for_status("green", "yellow")
