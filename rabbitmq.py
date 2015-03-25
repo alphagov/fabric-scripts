@@ -65,3 +65,4 @@ def safe_reboot():
         sleep(5)
 
     execute(vm.reboot, hosts=[env['host_string']])
+    sleep(10)
