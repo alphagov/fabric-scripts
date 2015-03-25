@@ -34,7 +34,7 @@ def cluster_is_ok():
     partitions = re.search(r'\{partitions,\[([^]]*)\]', status)
 
     if not known_nodes or not running_nodes or not partitions:
-        print("Couldn't parse status output: %r" % status)
+        print("No matches found in output: %r" % status)
         return False
 
     known_nodes = ','.join(sorted(known_nodes.group(1).split(',')))
