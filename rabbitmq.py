@@ -28,7 +28,7 @@ def cluster_is_ok():
     # We need to ensure that partitions is empty, and the list of running nodes
     # is the same as the list of known nodes.
 
-    status = re.sub(r'\s', '', status) 
+    status = re.sub(r'\s', '', status)
     known_nodes = re.search(r'\{nodes,\[\{disc,\[([^]]+)\]', status)
     running_nodes = re.search(r'\{running_nodes,\[([^]]+)\]', status)
     partitions = re.search(r'\{partitions,\[([^]]*)\]', status)
