@@ -28,13 +28,13 @@ def cluster_is_ok():
     # We need to ensure that partitions is empty, and the list of running nodes
     # is the same as the list of known nodes.
 
-    status = re.sub(r'\s', '', status) 
+    status = re.sub(r'\s', '', status)
     known_nodes = re.search(r'\{nodes,\[\{disc,\[([^]]+)\]', status)
     running_nodes = re.search(r'\{running_nodes,\[([^]]+)\]', status)
     partitions = re.search(r'\{partitions,\[([^]]*)\]', status)
 
     if not known_nodes or not running_nodes or not partitions:
-        print("Couldn't parse status output: %r" % status)
+        print("No matches found in output: %r" % status)
         return False
 
     known_nodes = ','.join(sorted(known_nodes.group(1).split(',')))
@@ -65,3 +65,4 @@ def safe_reboot():
         sleep(5)
 
     execute(vm.reboot, hosts=[env['host_string']])
+    sleep(10)
