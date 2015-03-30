@@ -1,4 +1,5 @@
 from fabric.api import *
+from time import sleep
 import json
 import re
 import vm
@@ -19,22 +20,81 @@ def status(index):
 @task
 def cluster_health():
     """Get cluster status"""
-    return run("curl -XGET 'http://localhost:9200/_cluster/health?pretty'")
+    return run("curl -XGET 'http://localhost:9200/_cluster/health?pretty'",
+               warn_only=True)
 
 @task
 def cluster_nodes():
     """Get cluster nodes"""
     return run("curl -XGET 'http://localhost:9200/_cluster/nodes?pretty'")
 
+
+def put_setting(setting, value):
+    result = run("""curl -XPUT 'http://localhost:9200/_cluster/settings' -d '{
+        "transient": {"%s": "%s"}
+    }'""" % (setting, value))
+    parsed_result = json.loads(result)
+    if not parsed_result.get("ok") or not parsed_result.get("acknowledged"):
+        raise RuntimeError("Failed to put setting: %s" % (result, ))
+
+
+@task
+def disable_reallocation():
+    # Note - this API is deprecated in elasticsearch 1.0+, in favour of
+    # setting "cluster.routing.allocation.enable" to "none", see
+    # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
+    put_setting("cluster.routing.allocation.disable_allocation", "true")
+
+
+@task
+def enable_reallocation():
+    # Note - this API is deprecated in elasticsearch 1.0+, in favour of
+    # setting "cluster.routing.allocation.enable" to "all", see
+    # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
+    put_setting("cluster.routing.allocation.disable_allocation", "false")
+
+
+def wait_for_status(*allowed):
+    while True:
+        output = cluster_health()
+        try:
+            health = json.loads(output)
+        except ValueError:
+            status = "INVALID RESPONSE"
+        else:
+            status = health['status']
+            if (status in allowed):
+                return
+        print("Cluster health is %s, waiting for %s" % (status, allowed))
+        sleep(5)
+
+
 @task
 @serial
 @runs_once
 def safe_reboot():
     """Reboot only if the cluster is currently green"""
-    health = json.loads(cluster_health())
-    if (health['status'] != 'green'):
-        abort("Cluster health is %s, won't reboot" % health['status'])
-    execute(vm.reboot, hosts=[env['host_string']])
+    import vm
+    if not vm.reboot_required():
+        print("No reboot required")
+        return
+
+    wait_for_status("green")
+    disable_reallocation()
+
+    try:
+        execute(vm.reboot, hosts=[env['host_string']])
+
+        # Give the reboot time to start, before we check for the status again.
+        sleep(10)
+
+        # Status won't usually go back to green while reallocation is turned off,
+        # but should go to yellow.
+        wait_for_status("green", "yellow")
+        enable_reallocation()
+    except:
+        print "Failed to re-enable allocation - you will need to enable it again using the 'elasticsearch.enable_reallocation' fabric command"
+        raise
 
 
 @task
