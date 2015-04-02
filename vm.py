@@ -1,4 +1,5 @@
 from fabric.api import *
+from fabric.utils import error
 import re
 
 @task
@@ -63,12 +64,7 @@ def bodge_unicorn(name):
 
 @task
 def reload_unicorn(name):
-    """
-    Gracefully reloads a named Unicorn process.
-
-    This is the same piped command we use when deploying applications.
-    """
-    sudo('sudo initctl start %s 2>/dev/null || sudo initctl reload %s' % (name, name))
+    error("task deprecated by 'app.reload'")
 
 def reboot_required():
     """
