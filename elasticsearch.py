@@ -1,3 +1,4 @@
+from distutils.version import StrictVersion
 from fabric.api import *
 from time import sleep
 import json
@@ -41,8 +42,11 @@ def put_setting(setting, value):
         "transient": {"%s": "%s"}
     }'""" % (setting, value))
     parsed_result = json.loads(result)
-    if not parsed_result.get("ok") or not parsed_result.get("acknowledged"):
-        raise RuntimeError("Failed to put setting: %s" % (result, ))
+    if not parsed_result.get("acknowledged"):
+        raise RuntimeError("Failed to put setting: %s".format(result))
+    if StrictVersion(version()) < StrictVersion('1.0'):
+        if not parsed_result.get("ok"):
+            raise RuntimeError("Failed to put setting: %s".format(result))
 
 
 @task
