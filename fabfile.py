@@ -23,6 +23,7 @@ import graphite
 import incident
 import kernel
 import licensify
+import locksmith
 import logstream
 import mongo
 import mainstream_slugs
