@@ -51,18 +51,22 @@ def put_setting(setting, value):
 
 @task
 def disable_reallocation():
-    # Note - this API is deprecated in elasticsearch 1.0+, in favour of
-    # setting "cluster.routing.allocation.enable" to "none", see
+    # Note - disable_allocation is deprecated in elasticsearch 1.0+, see
     # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
-    put_setting("cluster.routing.allocation.disable_allocation", "true")
+    if StrictVersion(version()) > StrictVersion('1.0'):
+        put_setting("cluster.routing.allocation.enable", "none")
+    else:
+        put_setting("cluster.routing.allocation.disable_allocation", "true")
 
 
 @task
 def enable_reallocation():
-    # Note - this API is deprecated in elasticsearch 1.0+, in favour of
-    # setting "cluster.routing.allocation.enable" to "all", see
+    # Note - disable_allocation is deprecated in elasticsearch 1.0+, see
     # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
-    put_setting("cluster.routing.allocation.disable_allocation", "false")
+    if StrictVersion(version()) > StrictVersion('1.0'):
+        put_setting("cluster.routing.allocation.enable", "all")
+    else:
+        put_setting("cluster.routing.allocation.disable_allocation", "false")
 
 
 def wait_for_status(*allowed):
