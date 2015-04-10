@@ -29,6 +29,13 @@ def cluster_nodes():
     return run("curl -XGET 'http://localhost:9200/_cluster/nodes?pretty'")
 
 
+def version():
+    with hide('stdout'):
+        elasticsearch_info = run("curl http://localhost:9200")
+    version = json.loads(elasticsearch_info)['version']['number']
+    return version
+
+
 def put_setting(setting, value):
     result = run("""curl -XPUT 'http://localhost:9200/_cluster/settings' -d '{
         "transient": {"%s": "%s"}
