@@ -2,6 +2,8 @@ from fabric.api import *
 from fabric.utils import error
 import re
 
+import nagios
+
 @task
 def uptime():
     """Show uptime and load"""
@@ -89,8 +91,7 @@ def reboot():
 @task
 def force_reboot():
   """Schedule a host for downtime in nagios and force reboot (even if not required)"""
-  from nagios import schedule_downtime
-  execute(schedule_downtime, env['host_string'])
+  execute(nagios.schedule_downtime, env['host_string'])
   run("sudo shutdown -r now")
 
 @task
@@ -100,8 +101,7 @@ def poweroff():
   Usage:
   fab production -H frontend-1.frontend.production vm.poweroff
   """
-  from nagios import schedule_downtime
-  execute(schedule_downtime, env['host_string'])
+  execute(nagios.schedule_downtime, env['host_string'])
   run("sudo poweroff")
 
 @task

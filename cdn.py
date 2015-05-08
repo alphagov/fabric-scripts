@@ -1,6 +1,6 @@
 from fabric.api import *
 
-from cache import purge as cache_purge
+import cache
 
 @task
 @runs_once
@@ -16,5 +16,5 @@ def fastly_purge(*args):
 @task
 def purge_all(*args):
     "Purge items from Fastly and cache machines, eg \"/one,/two,/three\""
-    execute(cache_purge, *args)
+    execute(cache.purge, *args)
     execute(fastly_purge, *args)
