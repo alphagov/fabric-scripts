@@ -14,9 +14,7 @@ def fastly_purge(*args):
             run("curl -s -X PURGE -H 'Host: {0}' {1}{2}".format(hostname, govuk_fastly, govuk_path.strip()))
 
 @task
-@runs_once
-@roles('class-cache')
 def purge_all(*args):
     "Purge items from Fastly and cache machines, eg \"/one,/two,/three\""
-    cache_purge(*args)
-    fastly_purge(*args)
+    execute(cache_purge, *args)
+    execute(fastly_purge, *args)
