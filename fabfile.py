@@ -194,13 +194,16 @@ def _known_hosts_outdated(local_filename, remote_filename):
     return local_checksum != remote_checksum
 
 
-def _set_gateway(name):
+def _set_gateway(name, draft=False):
     """
     Set the remote gateway box by environment name. Sets the Fabric env.gateway
     setting and makes sure that the correct known_hosts file will be consulted,
     then dynamically fetches a list of hosts from the gateway box.
     """
-    env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
+    if draft:
+      env.gateway = 'jumpbox.draft.{0}.publishing.service.gov.uk'.format(name)
+    else:
+      env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
     env.system_known_hosts = _fetch_known_hosts()
     env.roledefs.fetch()
 
@@ -220,14 +223,29 @@ def production():
     _set_gateway('production')
 
 @task
+def draft_production():
+    """Select draft production environment"""
+    _set_gateway('production', draft=True)
+
+@task
 def staging():
     """Select staging environment"""
     _set_gateway('staging')
 
 @task
+def draft_staging():
+    """Select draft staging environment"""
+    _set_gateway('staging', draft=True)
+
+@task
 def preview():
     """Select preview environment"""
     _set_gateway('preview')
+
+@task
+def draft_preview():
+    """Select draft preview environment"""
+    _set_gateway('preview', draft=True)
 
 @task
 def all():
