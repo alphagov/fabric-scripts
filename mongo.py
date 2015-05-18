@@ -44,7 +44,10 @@ def replsetlogs(*args):
 
 @task
 def force_resync():
-    """Force a mongo secondary to resync by removing all it's data."""
+    """Force a mongo secondary to resync by removing all its data."""
+    if len(env.hosts) > 1:
+        abort("This task should only be run on one host at a time")
+
     if i_am_primary():
         abort(colors.red("Refusing to force resync on primary", bold=True))
 
