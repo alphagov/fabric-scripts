@@ -45,6 +45,10 @@ SSH_DIR = os.path.join(HERE, '.ssh')
 # How old a local hosts file can be before we check for an update
 HOSTS_FILE_CACHE_TIME = 3600 * 24
 
+# When to warn that you haven't pulled the repo recently.
+REPO_OUTDATED_TIME = 3600 * 24 * 5
+REPO_OUTDATED_FILE = os.path.join(HERE, '.git/FETCH_HEAD')
+
 ABORT_MSG = textwrap.dedent("""
     You must select an environment before running this task, e.g.
 
@@ -193,6 +197,9 @@ def _known_hosts_outdated(local_filename, remote_filename):
 
     return local_checksum != remote_checksum
 
+def _check_repo_age():
+    if time.time() - os.path.getmtime(REPO_OUTDATED_FILE) > REPO_OUTDATED_TIME:
+        warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
 
 def _set_gateway(name, draft=False):
     """
@@ -321,3 +328,4 @@ def sdo(command):
     sudo(command)
 
 env.roledefs = RoleFetcher()
+_check_repo_age()
