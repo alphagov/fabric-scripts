@@ -30,7 +30,7 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
 def unarchive_content(*edition_ids):
     """Unarchive Whitehall content"""
     for edition_id in edition_ids:
-        util.rake('whitehall', 'unarchive_edition', edition_id)
+        util.rake('whitehall', 'unwithdraw_edition', edition_id)
 
 
 @task
