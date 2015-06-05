@@ -31,7 +31,7 @@ def start():
     sudo('service nginx start')
 
 @task
-def hello_it():
+def force_restart():
     """Turns Nginx off and on again"""
     kill()
     start()
