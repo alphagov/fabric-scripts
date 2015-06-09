@@ -95,7 +95,6 @@ def wait_for_status(*allowed):
 
 @task
 @serial
-@runs_once
 def safe_reboot():
     """Reboot only if the cluster is currently green"""
     import vm
@@ -112,12 +111,16 @@ def safe_reboot():
         # Give the reboot time to start, before we check for the status again.
         sleep(10)
 
-        # Status won't usually go back to green while reallocation is turned off,
-        # but should go to yellow.
+        # Status won't usually go back to green while reallocation is turned
+        # off, but should go to yellow.
         wait_for_status("green", "yellow")
         enable_reallocation()
     except:
-        print "Failed to re-enable allocation - you will need to enable it again using the 'elasticsearch.enable_reallocation' fabric command"
+        print(
+            "Failed to re-enable allocation - "
+            "you will need to enable it again using the "
+            "'elasticsearch.enable_reallocation' fabric command"
+        )
         raise
 
 
