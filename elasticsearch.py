@@ -74,18 +74,23 @@ def enable_reallocation():
 
 
 def wait_for_status(*allowed):
-    while True:
-        output = cluster_health()
-        try:
-            health = json.loads(output)
-        except ValueError:
-            status = "INVALID RESPONSE"
-        else:
-            status = health['status']
-            if (status in allowed):
-                return
-        print("Cluster health is %s, waiting for %s" % (status, allowed))
-        sleep(5)
+    with settings(hide('output', 'running', 'warnings'), abort_on_prompts=True):
+        while True:
+            try:
+                output = cluster_health()
+                health = json.loads(output)
+            except (ValueError, SystemExit):
+                # Catching SystemExit is horrible but abort_on_prompts
+                # raises a SystemExit, this may change in fabric 2
+                # https://github.com/fabric/fabric/issues/762
+                status = "INVALID RESPONSE"
+            else:
+                status = health['status']
+                if (status in allowed):
+                    print("Cluster health is %s, matches %s" % (status, allowed))
+                    return
+            print("Cluster health is %s, waiting for %s" % (status, allowed))
+            sleep(5)
 
 
 @task
