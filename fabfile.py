@@ -30,6 +30,7 @@ import mysql
 import nagios
 import nginx
 import ntp
+import postgresql
 import puppet
 import rabbitmq
 import rkhunter

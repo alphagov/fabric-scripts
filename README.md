@@ -73,3 +73,15 @@ and ensure that you do not have the following option anywhere in your
 `~/.ssh/config`:
 
     ForwardAgent yes
+
+## Syncing postgres machines
+
+An example
+
+`fab <env> -H '<src_db>' postgresql.sync:<db_name>,<dst_db> -A`
+
+the -A must be specified to forward the agent
+
+This will sync the specified database `<db_name>` from the machine with the
+hostname of `<src_db>` to the machine with hostaname `<dst_db>`. It will destroy
+data on the destination db
