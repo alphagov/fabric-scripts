@@ -4,11 +4,9 @@
 and systems administration tasks. It allows the user to run commands across a
 server farm.
 
-## Local usage
+This repository is intended to be setup and run on your local workstation/laptop.
 
-This is intended to be setup and run on your local workstation/laptop.
-
-### Setup
+## Setup
 
 To install the dependencies:
 
@@ -24,7 +22,7 @@ Configure it (see [the fabric documentation][fabdoc] for more examples),
 
 [fabdoc]: http://docs.fabfile.org/en/latest/usage/fab.html
 
-### Commands
+## Commands
 
 You can view a list of the available tasks:
 
@@ -37,7 +35,7 @@ And execute against an environment and set of hosts like so:
     $ fab preview class:frontend do:'uname -a'
     ...
 
-### Targetting groups of machines
+## Targetting groups of machines
 
 Fabric tasks can be run on groups of machines in a variety of different ways.
 
@@ -60,19 +58,6 @@ by the node name
 
     # target just one node
     $ fab production -H backend-3.backend do:'uname -a'
-
-## Remote usage (legacy)
-
-It was previously possible to use these scripts from the jumpboxes via the
-`govuk_fab` wrapper. This is no longer supported as it relied on SSH agent
-forwarding, which is a Bad Thing because other people with root access to
-that jumpbox would be able to re-use any of the private keys in your agent.
-
-You should convert to the [local usage](#Local usage) method described above
-and ensure that you do not have the following option anywhere in your
-`~/.ssh/config`:
-
-    ForwardAgent yes
 
 ## Syncing postgres machines
 
