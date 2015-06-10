@@ -35,26 +35,26 @@ And execute against an environment and set of hosts like so:
     $ fab preview class:frontend do:'uname -a'
     ...
 
-## Targetting groups of machines
+## Targeting groups of machines
 
 Fabric tasks can be run on groups of machines in a variety of different ways.
 
-by puppet class
+By Puppet class:
 
     # target all machines that have the 'govuk::safe_to_reboot::yes' class
     $ fab preview puppet_class:govuk::safe_to_reboot::yes do:'uname -a'
 
-by numeric machine suffix
+By numeric machine suffix:
 
     # target all machines that end in '2'
     $ fab preview numbered:2 do:'uname -a'
 
-by node type (as defined in puppet)
+By node type (as defined in Puppet):
 
     # target all 'frontend' machines
     $ fab preview node_type:frontend do:'uname -a'
 
-by the node name
+By the node name:
 
     # target just one node
     $ fab production -H backend-3.backend do:'uname -a'
