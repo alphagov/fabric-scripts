@@ -199,6 +199,8 @@ def _known_hosts_outdated(local_filename, remote_filename):
     return local_checksum != remote_checksum
 
 def _check_repo_age():
+    if not os.path.exists(REPO_OUTDATED_FILE):
+        return
     if time.time() - os.path.getmtime(REPO_OUTDATED_FILE) > REPO_OUTDATED_TIME:
         warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
 
