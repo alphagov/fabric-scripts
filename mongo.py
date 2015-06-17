@@ -211,3 +211,16 @@ def safe_reboot():
         abort("Cluster has not recovered")
 
     execute(vm.reboot, hosts=[env['host_string']])
+
+
+@task
+def mount_licensify_encrypted_drive():
+    with settings(ok_ret_codes=[0, 1]):
+        result = run('grep /var/lib/mongodb /proc/mounts')
+        if result.return_code == 0:
+            exit('/var/lib/mongodb is already mounted on this host.')
+    with settings(warn_only=True):
+        sudo('service mongodb stop')
+    sudo('rm -rf /var/lib/mongodb/*')
+    sudo('mount /var/lib/mongodb')
+    sudo('service mongodb start')
