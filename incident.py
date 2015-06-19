@@ -1,4 +1,5 @@
 from fabric.api import *
+from fabric.tasks import execute
 import nginx
 import puppet
 
@@ -7,7 +8,7 @@ import puppet
 def fail_to_mirror():
     """Fails the site to the mirror by stopping nginx on the cache nodes"""
     puppet.disable("Fabric fail_to_mirror task invoked")
-    nginx_kill()
+    execute(nginx.kill)
     print("Disabled Puppet and www.gov.uk vhost, remember to re-enable and re-run puppet to restore previous state")
 
 @task
