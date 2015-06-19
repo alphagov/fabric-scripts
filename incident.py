@@ -9,7 +9,8 @@ def fail_to_mirror():
     """Fails the site to the mirror by stopping nginx on the cache nodes"""
     puppet.disable("Fabric fail_to_mirror task invoked")
     execute(nginx.kill)
-    print("Disabled Puppet and www.gov.uk vhost, remember to re-enable and re-run puppet to restore previous state")
+    print('Disabled Puppet and switched off Nginx.')
+    print('Run `incident.recover_origin` to start serving from origin again.')
 
 @task
 @roles('class-cache')
