@@ -26,6 +26,7 @@ import locksmith
 import logstream
 import mongo
 import mainstream_slugs
+import mapit
 import mysql
 import nagios
 import nginx
