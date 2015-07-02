@@ -205,16 +205,13 @@ def _check_repo_age():
     if time.time() - os.path.getmtime(REPO_OUTDATED_FILE) > REPO_OUTDATED_TIME:
         warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
 
-def _set_gateway(name, draft=False):
+def _set_gateway(name):
     """
     Set the remote gateway box by environment name. Sets the Fabric env.gateway
     setting and makes sure that the correct known_hosts file will be consulted,
     then dynamically fetches a list of hosts from the gateway box.
     """
-    if draft:
-      env.gateway = 'jumpbox.draft.{0}.publishing.service.gov.uk'.format(name)
-    else:
-      env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
+    env.gateway = 'jumpbox.{0}.alphagov.co.uk'.format(name)
     env.system_known_hosts = _fetch_known_hosts()
     env.roledefs.fetch()
 
@@ -234,29 +231,14 @@ def production():
     _set_gateway('production')
 
 @task
-def draft_production():
-    """Select draft production environment"""
-    _set_gateway('production', draft=True)
-
-@task
 def staging():
     """Select staging environment"""
     _set_gateway('staging')
 
 @task
-def draft_staging():
-    """Select draft staging environment"""
-    _set_gateway('staging', draft=True)
-
-@task
 def preview():
     """Select preview environment"""
     _set_gateway('preview')
-
-@task
-def draft_preview():
-    """Select draft preview environment"""
-    _set_gateway('preview', draft=True)
 
 @task
 def all():
