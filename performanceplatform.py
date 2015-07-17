@@ -1,4 +1,4 @@
-from fabric.api import (cd, task, hosts, sudo)
+from fabric.api import (task, hosts, run)
 
 
 @task
@@ -24,8 +24,4 @@ def unpublish_dashboard(slug):
 
 
 def run_stagecraft_postgres_command(sql_command):
-    with cd('/'):
-        # Run this command from the root directory so that we don't see errors
-        # accessing the users
-        # home directory as the postgres user.
-        sudo('psql stagecraft -c "{0}"'.format(sql_command), user='postgres')
+    run('sudo -iu postgres psql stagecraft -c "{0}"'.format(sql_command))
