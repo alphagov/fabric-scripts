@@ -96,7 +96,7 @@ class RoleFetcher(object):
 
         for host in self.hosts:
             try:
-                name, vdc, _ = host.split('.', 3)
+                name, vdc, _ = host.split('.', 2)
             except ValueError:
                 warn("discarding badly formatted hostname '{0}'".format(host))
                 continue
