@@ -12,6 +12,9 @@ from fabric.api import (abort, env, get, hide, hosts, local, puts, run,
                         runs_once, serial, settings, sudo, task, warn)
 from fabric.task_utils import crawl
 
+# Other submodules such as mapit depend on puppet, so include this one first
+import puppet
+
 # Our command submodules
 import app
 import apt
@@ -33,7 +36,6 @@ import nginx
 import ntp
 import performanceplatform
 import postgresql
-import puppet
 import rabbitmq
 import rkhunter
 import search
