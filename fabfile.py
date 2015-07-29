@@ -236,11 +236,6 @@ def production():
 @task
 def staging():
     """Select staging environment"""
-    _set_gateway('staging')
-
-@task
-def staging_migration():
-    """Select new staging environment"""
     _set_gateway('staging', 'publishing.service.gov.uk')
 
 @task
