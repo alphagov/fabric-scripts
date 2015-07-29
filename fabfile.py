@@ -234,6 +234,11 @@ def production():
     _set_gateway('production.alphagov.co.uk')
 
 @task
+def production_migration():
+    """Select production migration environment"""
+    _set_gateway('publishing.service.gov.uk')
+
+@task
 def staging():
     """Select staging environment"""
     _set_gateway('staging.publishing.service.gov.uk')
