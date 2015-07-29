@@ -5,24 +5,28 @@ import json
 import re
 import vm
 
+
 @task
 def delete(index):
     """Delete an index"""
     if re.match('^[^/]+$', index):
-      run("curl -XDELETE 'http://localhost:9200/%s'" % index)
+        run("curl -XDELETE 'http://localhost:9200/%s'" % index)
     else:
-      abort("Invalid index provided '%s'" % index)
+        abort("Invalid index provided '%s'" % index)
+
 
 @task
 def status(index):
     """Get the status of an index"""
     run("curl -XGET 'http://localhost:9200/%s/_status'" % index)
 
+
 @task
 def cluster_health():
     """Get cluster status"""
     return run("curl -XGET 'http://localhost:9200/_cluster/health?pretty'",
                warn_only=True)
+
 
 @task
 def cluster_nodes():
@@ -70,23 +74,27 @@ def enable_reallocation():
 
 
 def wait_for_status(*allowed):
-    while True:
-        output = cluster_health()
-        try:
-            health = json.loads(output)
-        except ValueError:
-            status = "INVALID RESPONSE"
-        else:
-            status = health['status']
-            if (status in allowed):
-                return
-        print("Cluster health is %s, waiting for %s" % (status, allowed))
-        sleep(5)
+    with settings(hide('output', 'running', 'warnings'), abort_on_prompts=True):
+        while True:
+            try:
+                output = cluster_health()
+                health = json.loads(output)
+            except (ValueError, SystemExit):
+                # Catching SystemExit is horrible but abort_on_prompts
+                # raises a SystemExit, this may change in fabric 2
+                # https://github.com/fabric/fabric/issues/762
+                status = "INVALID RESPONSE"
+            else:
+                status = health['status']
+                if (status in allowed):
+                    print("Cluster health is %s, matches %s" % (status, allowed))
+                    return
+            print("Cluster health is %s, waiting for %s" % (status, allowed))
+            sleep(5)
 
 
 @task
 @serial
-@runs_once
 def safe_reboot():
     """Reboot only if the cluster is currently green"""
     import vm
@@ -103,12 +111,16 @@ def safe_reboot():
         # Give the reboot time to start, before we check for the status again.
         sleep(10)
 
-        # Status won't usually go back to green while reallocation is turned off,
-        # but should go to yellow.
+        # Status won't usually go back to green while reallocation is turned
+        # off, but should go to yellow.
         wait_for_status("green", "yellow")
         enable_reallocation()
     except:
-        print "Failed to re-enable allocation - you will need to enable it again using the 'elasticsearch.enable_reallocation' fabric command"
+        print(
+            "Failed to re-enable allocation - "
+            "you will need to enable it again using the "
+            "'elasticsearch.enable_reallocation' fabric command"
+        )
         raise
 
 
