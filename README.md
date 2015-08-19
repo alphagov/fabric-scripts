@@ -35,6 +35,7 @@ And execute against an environment and set of hosts like so:
     $ fab preview all hosts
     ...
     $ fab preview class:frontend do:'uname -a'
+    $ fab preview class:cache,bouncer do:uptime
     ...
 
 ### Targetting groups of machines
