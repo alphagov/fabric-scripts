@@ -231,21 +231,25 @@ def help(name):
 @task
 def production():
     """Select production environment"""
+    env['environment'] = 'production'
     _set_gateway('production.alphagov.co.uk')
 
 @task
 def production_migration():
     """Select production migration environment"""
+    env['environment'] = 'production'
     _set_gateway('publishing.service.gov.uk')
 
 @task
 def staging():
     """Select staging environment"""
+    env['environment'] = 'staging'
     _set_gateway('staging.publishing.service.gov.uk')
 
 @task
 def preview():
     """Select preview environment"""
+    env['environment'] = 'preview'
     _set_gateway('preview.alphagov.co.uk')
 
 @task
