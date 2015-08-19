@@ -263,9 +263,10 @@ def numbered(number):
     env.hosts = [host for host in env.hosts if re.search((r'-%s\.' % number), host)]
 
 @task(name='class')
-def klass(class_name):
+def klass(*class_names):
     """Select a machine class"""
-    env.hosts.extend(env.roledefs['class-%s' % class_name]())
+    for class_name in class_names:
+        env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 @task
 @serial
