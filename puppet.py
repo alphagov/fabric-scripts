@@ -1,11 +1,5 @@
 from fabric.api import *
 
-@task
-def loadhosts(*classnames):
-    """Deprecated, use puppet_class"""
-    usage = ["puppet_class:{0}".format(name) for name in classnames]
-    abort("puppet.loadhosts is deprecated, use: {0}".format(" ".join(usage)))
-
 def puppet(*args):
     sudo('govuk_puppet %s' % ' '.join(args))
 
