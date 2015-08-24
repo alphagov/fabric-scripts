@@ -271,10 +271,11 @@ def klass(*class_names):
 @task
 @serial
 @hosts('localhost')
-def puppet_class(class_name):
+def puppet_class(*class_names):
     """Select all machines which include a given puppet class"""
-    env.roledefs.fetch_puppet_class(class_name)
-    env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
+    for class_name in class_names:
+        env.roledefs.fetch_puppet_class(class_name)
+        env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
 
 @task
 @hosts('localhost')
