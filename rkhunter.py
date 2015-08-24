@@ -3,7 +3,7 @@ from fabric.api import *
 @task(default=True)
 def check(*args):
     """Run rkhunter on the machine"""
-    sudo('/usr/bin/rkhunter --cronjob --report-warnings-only --appendlog')
+    sudo('/etc/cron.daily/rkhunter-passive-check')
 
 @task
 def propupdate(*args):
