@@ -122,3 +122,20 @@ def host_key(hostname):
   else:
     with hide('running'):
       run("ssh-keygen -l -f /dev/stdin <<< '{0}'".format(ssh_key))
+
+@task
+@parallel(pool_size=5)
+def connected_users():
+  """
+  Output a list of users who are logged in to a machine
+  """
+
+  with hide('running', 'stdout'):
+    username = run('whoami')
+    users = run('who | grep -v {0} || true'.format(username))
+
+  if users:
+    print 'There are users connected to {0}:'.format(env.host_string)
+    for user in users.split("\n"):
+      print '  - {0}'.format(user.split(' ')[0])
+    print "\n"
