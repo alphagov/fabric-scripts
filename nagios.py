@@ -1,6 +1,7 @@
+from urllib import quote_plus
 from StringIO import StringIO
+import json
 import string
-import requests
 
 from fabric.api import *
 
@@ -60,18 +61,27 @@ def schedule_downtime(host,minutes='20'):
 
 @task
 @runs_once
-def loadhosts():
+@hosts(['alert.cluster'])
+def loadhosts(search_string=''):
     """Load hosts from an Icinga URL in jsonformat.
 
-    Prompts for a URL like:
-        https://nagios.example.com/cgi-bin/icinga/status.cgi?search_string=puppet+last+run&limit=0&start=1&servicestatustypes=29
+    Optionally takes a search string. If provided, searches for all unhandled problems.
+    If not provided, prompts for a URL like:
+        https://alert.cluster/cgi-bin/icinga/status.cgi?search_string=puppet+last+run&limit=0&start=1&servicestatustypes=29
     """
 
-    url = prompt("Icinga URL (jsonformat): ")
-    resp = requests.get(url, verify=False)
+    if search_string:
+        url_safe_search_string = quote_plus(search_string)
+        url = 'https://alert.cluster/cgi-bin/icinga/status.cgi?search_string={0}&allunhandledproblems&jsonoutput'.format(url_safe_search_string)
+    else:
+        url = prompt("Icinga URL (jsonformat): ")
+
+    with hide('running', 'stdout'):
+        resp = run('curl --insecure "{0}"'.format(url))
+
     hosts = [
         service['host_name'].split('.production').pop(0)
-        for service in resp.json()['status']['service_status']
+        for service in json.loads(resp)['status']['service_status']
     ]
 
     print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
