@@ -8,8 +8,13 @@ import cache
 @roles('class-cache')
 def fastly_purge(*args):
     "Purge items from Fastly, eg \"/one,/two,/three\". Wildcards not supported."
-    govuk_fastly = 'http://www-gov-uk.map.fastly.net'
-    hostnames_to_purge = ['www.gov.uk', 'assets.digital.cabinet-office.gov.uk']
+    if env.environment == 'production':
+        hostnames_to_purge = ['www.gov.uk', 'assets.digital.cabinet-office.gov.uk']
+    elif env.environment == 'staging':
+        # FIXME - Staging Fastly service should point to non alphagov.co.uk
+        # domains and amended here after the miration to Carrenza
+        hostnames_to_purge = ['www.staging.alphagov.co.uk', 'assets.staging.alphagov.co.uk']
+
     for path in args:
         if "*" in path:
             abort("Sorry, purging paths containing wildcards is not supported "
@@ -18,7 +23,7 @@ def fastly_purge(*args):
                 % path)
     for govuk_path in args:
         for hostname in hostnames_to_purge:
-            run("curl -s -X PURGE -H 'Host: {0}' {1}{2} | grep 'ok'".format(hostname, govuk_fastly, govuk_path.strip()))
+            run("curl -s -X PURGE {0}{1} | grep 'ok'".format(hostname, govuk_path.strip()))
 
 @task
 def purge_all(*args):
