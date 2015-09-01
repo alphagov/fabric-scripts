@@ -11,9 +11,7 @@ def fastly_purge(*args):
     if env.environment == 'production':
         hostnames_to_purge = ['www.gov.uk', 'assets.digital.cabinet-office.gov.uk']
     elif env.environment == 'staging':
-        # FIXME - Staging Fastly service should point to non alphagov.co.uk
-        # domains and amended here after the miration to Carrenza
-        hostnames_to_purge = ['www.staging.alphagov.co.uk', 'assets.staging.alphagov.co.uk']
+        hostnames_to_purge = ['www.staging.publishing.service.gov.uk', 'assets.staging.publishing.service.gov.uk']
 
     for path in args:
         if "*" in path:
