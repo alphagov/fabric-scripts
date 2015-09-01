@@ -27,6 +27,23 @@ def check_disabled():
         sudo('test -f {0} && echo DISABLED || echo ENABLED'.format(lockfile))
 
 @task
+def regenerate_certificate():
+    """Regenerate a node certificate"""
+    if len(env.hosts) > 1:
+      abort("This task should only be run on one host at a time.")
+
+    sudo('rm -f /etc/puppet/ssl/certs/{}.pem'.format(env.hosts[0]))
+    with settings(host_string='puppetmaster-1.management'):
+      sudo('govuk_node_clean {}'.format(env.hosts[0]))
+    puppet('--test')
+    with settings(host_string='puppetmaster-1.management.production'):
+      message = 'Notice: Signed certificate request for {}'.format(env.hosts[0])
+      while True:
+        output = sudo('puppet cert sign {} && sleep 5'.format(env.hosts[0]))
+        if output.startswith(message):
+          break
+
+@task
 def dryrun(*args):
     """Run puppet agent but make no changes to the system"""
     puppet('--noop', *args)
