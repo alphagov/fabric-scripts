@@ -77,7 +77,14 @@ def loadhosts(search_string=''):
         url = prompt("Icinga URL (jsonformat): ")
 
     with hide('running', 'stdout'):
-        resp = run('curl --insecure "{0}"'.format(url))
+        status_code = run('curl --silent --write-out "%{{http_code}}" --output /dev/null --insecure "{0}"'.format(url))
+        if status_code == '200':
+            resp = run('curl --insecure "{0}"'.format(url))
+        elif status_code == '401':
+            basic_auth_password = prompt('HTTP basic auth password: ')
+            resp = run('curl --user betademo:{1} --insecure "{0}"'.format(url, basic_auth_password))
+        else:
+            abort('Could not connect to monitoring service')
 
     hosts = [
         service['host_name'].split('.production').pop(0)
