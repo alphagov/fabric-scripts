@@ -2,8 +2,7 @@ from fabric.api import *
 
 
 def run_mysql_command(cmd):
-    with shell_env(HOME='/root'):
-        sudo('mysql -e "{}"'.format(cmd))
+    run('sudo -i mysql -e "{}"'.format(cmd))
 
 
 def switch_slow_query_log(value):
