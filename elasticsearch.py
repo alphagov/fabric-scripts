@@ -1,5 +1,8 @@
 from distutils.version import StrictVersion
+from elasticsearch_logdump import *
 from fabric.api import *
+from fabric.state import *
+from forward_tunnel import forward_tunnel
 from time import sleep
 import json
 import re
@@ -132,3 +135,33 @@ def redis_safe_reboot():
     log_length = run('redis-cli llen logs')
     if log_length == '(integer) 0':
         execute(vm.reboot, hosts=[env['host_string']])
+
+
+@task
+@runs_once
+@hosts('logs-elasticsearch-1.management')
+def dump_logs(date_from, date_to, query, fields):
+    # FIXME: Replace this and forward_tunnel.py once https://github.com/fabric/fabric/pull/939 is merged
+    forward_tunnel(9200, 'localhost', 9200, connections[env.host].get_transport())
+
+    date_from = datetime.datetime.strptime(date_from, DATE_FMT)
+    date_to = datetime.datetime.strptime(date_to, DATE_FMT)
+
+    q = LogQuery(query,
+                    date_from=date_from,
+                    date_to=date_to,
+                    fields=fields)
+
+    results = q.results()
+
+    if fields:
+        writer = csv.DictWriter(sys.stdout, fields.split(" "))
+        writer.writeheader()
+    else:
+        first = next(results)
+        writer = csv.DictWriter(sys.stdout, sorted(first.keys()))
+        writer.writeheader()
+        writer.writerow(first)
+
+    for item in results:
+        writer.writerow(item)
