@@ -2,8 +2,7 @@ from fabric.api import *
 
 
 def run_mysql_command(cmd):
-    with shell_env(HOME='/root'):
-        sudo('mysql -e "{}"'.format(cmd))
+    run('sudo -i mysql -e "{}"'.format(cmd))
 
 
 def switch_slow_query_log(value):
@@ -68,4 +67,53 @@ def setup_slave_from_master(master):
     run_mysql_command("START SLAVE")
     run_mysql_command("SET GLOBAL slow_query_log=ON")
 
-    run_mysql_command("SHOW SLAVE STATUS\G")
+    slave_status()
+
+
+@task
+def reset_slave():
+    """
+    Used to reset a slave if MySQL replication is failing
+
+    If you see that the slave is 'NULL' seconds behind the master,
+    the problem may be resolved by running this task.
+
+    See docs on 'RESET SLAVE':
+    https://dev.mysql.com/doc/refman/5.5/en/reset-slave.html
+    """
+
+    # Confirm slave status in case we need to refer to the values later
+    slave_status()
+    run_mysql_command("STOP SLAVE;")
+
+    with hide('everything'):
+        # Store last known log file and position
+        master_log_file = run("sudo -i mysql -e 'SHOW SLAVE STATUS\G' | grep '^\s*Relay_Master_Log_File:' | awk '{ print $2 }'")
+        master_log_pos = run("sudo -i mysql -e 'SHOW SLAVE STATUS\G' | grep '^\s*Exec_Master_Log_Pos:' | awk '{ print $2 }'")
+
+        if not master_log_file or not master_log_pos:
+            abort("Failed to determine replication log file and position, aborting.")
+
+    # Forget log file and position
+    run_mysql_command("RESET SLAVE;")
+
+    # Repoint log file and position to last known values
+    run_mysql_command("CHANGE MASTER TO MASTER_LOG_FILE='{}', MASTER_LOG_POS={};" \
+            .format(master_log_file, master_log_pos))
+    run_mysql_command("START SLAVE;")
+
+    with hide('everything'):
+        seconds_behind_master = run("sudo -i mysql -e 'SHOW SLAVE STATUS\G' | grep '^\s*Seconds_Behind_Master:' | awk '{ print $2 }'")
+
+    # Compare as a string to ensure we got a non-nil value from MySQL
+    if seconds_behind_master != '0':
+        abort("Slave is still behind master by {} seconds; run mysql.slave_status to check status" \
+                .format(seconds_behind_master))
+
+
+@task
+def slave_status():
+    """
+    Show status of MySQL replication on slave; must be run against the slave host
+    """
+    run_mysql_command("SHOW SLAVE STATUS\G;")
