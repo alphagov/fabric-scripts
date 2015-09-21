@@ -1,6 +1,7 @@
+from urllib import quote_plus
 from StringIO import StringIO
+import json
 import string
-import requests
 
 from fabric.api import *
 
@@ -60,18 +61,34 @@ def schedule_downtime(host,minutes='20'):
 
 @task
 @runs_once
-def loadhosts():
+@hosts(['alert.cluster'])
+def loadhosts(search_string=''):
     """Load hosts from an Icinga URL in jsonformat.
 
-    Prompts for a URL like:
-        https://nagios.example.com/cgi-bin/icinga/status.cgi?search_string=puppet+last+run&limit=0&start=1&servicestatustypes=29
+    Optionally takes a search string. If provided, searches for all unhandled problems.
+    If not provided, prompts for a URL like:
+        https://alert.cluster/cgi-bin/icinga/status.cgi?search_string=puppet+last+run&limit=0&start=1&servicestatustypes=29
     """
 
-    url = prompt("Icinga URL (jsonformat): ")
-    resp = requests.get(url, verify=False)
+    if search_string:
+        url_safe_search_string = quote_plus(search_string)
+        url = 'https://alert.cluster/cgi-bin/icinga/status.cgi?search_string={0}&allunhandledproblems&jsonoutput'.format(url_safe_search_string)
+    else:
+        url = prompt("Icinga URL (jsonformat): ")
+
+    with hide('running', 'stdout'):
+        status_code = run('curl --silent --write-out "%{{http_code}}" --output /dev/null --insecure "{0}"'.format(url))
+        if status_code == '200':
+            resp = run('curl --insecure "{0}"'.format(url))
+        elif status_code == '401':
+            basic_auth_password = prompt('HTTP basic auth password: ')
+            resp = run('curl --user betademo:{1} --insecure "{0}"'.format(url, basic_auth_password))
+        else:
+            abort('Could not connect to monitoring service')
+
     hosts = [
         service['host_name'].split('.production').pop(0)
-        for service in resp.json()['status']['service_status']
+        for service in json.loads(resp)['status']['service_status']
     ]
 
     print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
