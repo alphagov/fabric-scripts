@@ -1,6 +1,28 @@
 from fabric.api import *
+import fabric.contrib.files
+import puppet
+
+maintenance_config = '/etc/nginx/includes/maintenance.conf'
 
 @task
+def enable_maintenance:
+    """Enables a maintenance page and serves a 503"""
+    """Only to be run on loadbalancers"""
+    if not fabric.contrib.files.exists(maintenance_config):
+        abort("Sorry this task can only currently be run on loadbalancers")
+    puppet.disable("Maintenance mode enabled")
+    sudo("echo 'set $maintenance 1;' > {0}".format(maintenance_config))
+    sudo('service nginx reload')
+
+def disable_maintenance:
+    """Disables a maintenance page"""
+    """Only to be run on loadbalancers"""
+    if not fabric.contrib.files.exists(maintenance_config):
+        abort("Sorry this task can only currently be run on loadbalancers")
+    sudo("echo 'set $maintenance 0;' > {0}".format(maintenance_config))
+    sudo('service nginx reload')
+    puppet.enable()
+
 def gracefulstop(wait=True):
     """Gracefully shutdown Nginx by finishing any in-flight requests"""
     sudo('nginx -s quit')
