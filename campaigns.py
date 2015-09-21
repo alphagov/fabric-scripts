@@ -50,8 +50,6 @@ def template(app):
     env['template_contents'] = template.render(env.context)
 
 
-@task
-@roles('class-frontend')
 def deploy_banner(application):
     execute(template, application)
     if application == 'frontend':
