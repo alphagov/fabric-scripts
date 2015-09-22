@@ -5,7 +5,7 @@ import puppet
 maintenance_config = '/etc/nginx/includes/maintenance.conf'
 
 @task
-def enable_maintenance:
+def enable_maintenance():
     """Enables a maintenance page and serves a 503"""
     """Only to be run on loadbalancers"""
     if not fabric.contrib.files.exists(maintenance_config):
@@ -14,7 +14,7 @@ def enable_maintenance:
     sudo("echo 'set $maintenance 1;' > {0}".format(maintenance_config))
     sudo('service nginx reload')
 
-def disable_maintenance:
+def disable_maintenance():
     """Disables a maintenance page"""
     """Only to be run on loadbalancers"""
     if not fabric.contrib.files.exists(maintenance_config):
