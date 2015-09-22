@@ -14,6 +14,7 @@ def enable_maintenance():
     sudo("echo 'set $maintenance 1;' > {0}".format(maintenance_config))
     sudo('service nginx reload')
 
+@task
 def disable_maintenance():
     """Disables a maintenance page"""
     """Only to be run on loadbalancers"""
