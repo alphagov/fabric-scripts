@@ -14,23 +14,14 @@ def submit_nagios_cmd(command):
     sudo("printf '[%%lu] %s\n' `date +%%s` >> %s" % (command, NAGIOS_CMD_FILE))
 
 
-def _nagios_hostname(host):
-    """Returns the canonical name (according to nagios) for a host"""
-    name_parts = string.split(host,'.')
-    if len(name_parts) == 1:
-        raise ValueError("Shortnames not supported for nagios commands")
-    elif 'service' in name_parts:
-        env_expected_name_length = 7 if (('preview' in name_parts) | ('staging' in name_parts)) else 6
-        if len(name_parts) > env_expected_name_length:
-            raise ValueError("Don't understand name of nagios host: %s" % host)
-        elif len(name_parts) == env_expected_name_length:
-            return host
-    elif len(name_parts) > 3:
-        raise ValueError("Don't understand name of nagios host: %s" % host)
-    elif len(name_parts) == 3:
-        return host
-    elif len(name_parts) == 2:
+def _monitoring_hostname(host):
+    """Returns the canonical name (according to our monitoring) for a host"""
+    if env['environment'] == 'preview':
         return "%s.production" % host
+    elif env['environment'] == 'staging':
+        return "{0}.staging.publishing.service.gov.uk".format(host)
+    else:
+        return "{0}.publishing.service.gov.uk".format(host)
 
 
 @task
@@ -43,7 +34,7 @@ def schedule_downtime(host,minutes='20'):
     minutes = int(minutes)
     seconds = minutes * 60
 
-    host = _nagios_hostname(host)
+    host = _monitoring_hostname(host)
 
     command = "SCHEDULE_HOST_SVC_DOWNTIME;%(host)s;%(now)d;%(end)d;1;0;%(duration)d;fabric;fabric" % {
         'now': timestamp,
