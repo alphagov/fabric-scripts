@@ -14,8 +14,8 @@ def submit_nagios_cmd(command):
     sudo("printf '[%%lu] %s\n' `date +%%s` >> %s" % (command, NAGIOS_CMD_FILE))
 
 
-def _nagios_hostname(host):
-    """Returns the canonical name (according to nagios) for a host"""
+def _monitoring_hostname(host):
+    """Returns the canonical name (according to our monitoring) for a host"""
     if env['environment'] == 'preview':
         return "%s.production" % host
     elif env['environment'] == 'staging':
@@ -34,7 +34,7 @@ def schedule_downtime(host,minutes='20'):
     minutes = int(minutes)
     seconds = minutes * 60
 
-    host = _nagios_hostname(host)
+    host = _monitoring_hostname(host)
 
     command = "SCHEDULE_HOST_SVC_DOWNTIME;%(host)s;%(now)d;%(end)d;1;0;%(duration)d;fabric;fabric" % {
         'now': timestamp,
