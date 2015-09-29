@@ -1,7 +1,5 @@
 from urllib import quote_plus
-from StringIO import StringIO
 import json
-import string
 
 from fabric.api import *
 
