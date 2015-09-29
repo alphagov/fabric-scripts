@@ -1,5 +1,4 @@
-from fabric.api import task, sudo, env, settings, run
-from fabric.utils import abort
+from fabric.api import task, settings, run
 
 @task
 def sync(database, dest_machine):
