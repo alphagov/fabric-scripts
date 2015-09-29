@@ -1,0 +1,6 @@
+---
+language: "python"
+sudo: false # containerised builds
+install:
+  - "pip install -q -r requirements_for_tests.txt"
+script: "make test"
