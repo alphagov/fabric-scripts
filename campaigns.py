@@ -81,10 +81,7 @@ def deploy_emergency_banner():
     """Deploy an emergency banner to GOV.UK"""
     execute(set_context)
     for application in APPLICATIONS:
-        # Black banners are only placed on the homepage i.e.'frontend'.
-        # Don't deploy a black banner to the static application.
-        if not (env.campaign_class == 'black' and application == 'static'):
-            deploy_banner(application)
+        deploy_banner(application)
 
 @task
 @roles('class-frontend')
