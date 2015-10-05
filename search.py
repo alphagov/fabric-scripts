@@ -4,7 +4,10 @@ import util
 
 SEARCHABLE_APPS = {
     'calendars':               ('frontend',          ['panopticon:register']),
-    'designprinciples':        ('frontend',          ['rummager:index']), # Includes the service-manual. Note: not included in gov.uk/search
+
+    # Includes the service-manual. Note: not included in gov.uk/search
+    'designprinciples':        ('frontend',          ['rummager:index']),
+
     'frontend':                ('frontend',          ['rummager:index']),
     'licencefinder':           ('frontend',          ['panopticon:register']),
     'businesssupportfinder':   ('frontend',          ['panopticon:register']),
