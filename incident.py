@@ -3,6 +3,7 @@ from fabric.tasks import execute
 import nginx
 import puppet
 
+
 @task
 @roles('class-cache')
 def fail_to_mirror():
@@ -11,6 +12,7 @@ def fail_to_mirror():
     execute(nginx.kill)
     print('Disabled Puppet and switched off Nginx.')
     print('Run `incident.recover_origin` to start serving from origin again.')
+
 
 @task
 @roles('class-cache')

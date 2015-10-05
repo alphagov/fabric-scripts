@@ -75,6 +75,7 @@ ABORT_MSG = textwrap.dedent("""
         fab production vdcs
     """)
 
+
 class RoleFetcher(object):
     """
     RoleFetcher is a helper class, an instance of which can be bound to the
@@ -138,6 +139,7 @@ class RoleFetcher(object):
         if not self.fetched:
             abort(ABORT_MSG)
 
+
 def _fetch_hosts(extra_args=''):
     """
     Fetch a list of hosts in this environment, regardless of whether we're
@@ -152,6 +154,7 @@ def _fetch_hosts(extra_args=''):
         # Otherwise assume we're *in* the infrastructure
         else:
             return local(list_cmd).splitlines()
+
 
 def _fetch_known_hosts():
     """
@@ -177,6 +180,7 @@ def _fetch_known_hosts():
 
     return known_hosts_file
 
+
 def _known_hosts_outdated(local_filename, remote_filename):
     """Check whether a local copy of a jumpbox hosts file is outdated.
 
@@ -201,11 +205,13 @@ def _known_hosts_outdated(local_filename, remote_filename):
 
     return local_checksum != remote_checksum
 
+
 def _check_repo_age():
     if not os.path.exists(REPO_OUTDATED_FILE):
         return
     if time.time() - os.path.getmtime(REPO_OUTDATED_FILE) > REPO_OUTDATED_TIME:
         warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
+
 
 def _set_gateway(jumpbox_domain):
     """
@@ -217,6 +223,7 @@ def _set_gateway(jumpbox_domain):
     env.system_known_hosts = _fetch_known_hosts()
     env.roledefs.fetch()
 
+
 @task
 def help(name):
     """Show extended help for a task (e.g. 'fab help:search.reindex')"""
@@ -227,11 +234,13 @@ def help(name):
 
     puts(textwrap.dedent(task.__doc__).strip())
 
+
 @task
 def production():
     """Select production environment"""
     env['environment'] = 'production'
     _set_gateway('publishing.service.gov.uk')
+
 
 @task
 def staging():
@@ -239,16 +248,19 @@ def staging():
     env['environment'] = 'staging'
     _set_gateway('staging.publishing.service.gov.uk')
 
+
 @task
 def preview():
     """Select preview environment"""
     env['environment'] = 'preview'
     _set_gateway('preview.alphagov.co.uk')
 
+
 @task
 def all():
     """Select all machines in current environment"""
     env.hosts.extend(env.roledefs['all']())
+
 
 @task
 @runs_once
@@ -259,11 +271,13 @@ def numbered(number):
         abort("Unrecognised number: %s" % number)
     env.hosts = [host for host in env.hosts if re.search((r'-%s\.' % number), host)]
 
+
 @task(name='class')
 def klass(*class_names):
     """Select a machine class"""
     for class_name in class_names:
         env.hosts.extend(env.roledefs['class-%s' % class_name]())
+
 
 @task
 @serial
@@ -274,6 +288,7 @@ def puppet_class(*class_names):
         env.roledefs.fetch_puppet_class(class_name)
         env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
 
+
 @task
 @hosts('localhost')
 def node_type(node_name):
@@ -281,10 +296,12 @@ def node_type(node_name):
     class_name = 'govuk::node::s_{}'.format(node_name.replace('-', '_'))
     puppet_class(class_name)
 
+
 @task
 def vdc(vdc_name):
     """Select a virtual datacentre"""
     env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
+
 
 @task
 @runs_once
@@ -294,6 +311,7 @@ def hosts():
     hosts = me.get_hosts(None, None, None, env)
     print('\n'.join(sorted(hosts)))
 
+
 @task
 @runs_once
 def classes():
@@ -301,6 +319,7 @@ def classes():
     for name in sorted(env.roledefs.classes):
         hosts = env.roledefs['class-%s' % name]
         print("%-30.30s %s" % (name, len(hosts())))
+
 
 @task
 @runs_once
@@ -310,10 +329,12 @@ def vdcs():
         hosts = env.roledefs['vdc-%s' % name]
         print("%-30.30s %s" % (name, len(hosts())))
 
+
 @task
 def do(command):
     """Execute arbitrary commands"""
     run(command)
+
 
 @task
 def sdo(command):

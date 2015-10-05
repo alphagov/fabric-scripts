@@ -16,12 +16,14 @@ SEARCHABLE_APPS = {
     'whitehall':             ('whitehall_backend',  ['rummager:index']),
 }
 
+
 @task
 def list():
     """List known searchable applications"""
 
     for app in sorted(SEARCHABLE_APPS.keys()):
         puts(app)
+
 
 @task
 def reindex(app=None):

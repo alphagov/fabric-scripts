@@ -1,5 +1,6 @@
 from fabric.api import *
 
+
 @task
 @roles('class-licensify-frontend', 'class-licensify-backend')
 def greplogs(pattern, context=100):
@@ -8,4 +9,3 @@ def greplogs(pattern, context=100):
     run(grep_cmd.format(app='licensify',       pattern=pattern, context=context))
     run(grep_cmd.format(app='licensify-admin', pattern=pattern, context=context))
     run(grep_cmd.format(app='licensify-feed',  pattern=pattern, context=context))
-

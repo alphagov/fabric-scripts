@@ -1,5 +1,6 @@
 from fabric.api import task, settings, run
 
+
 @task
 def sync(database, dest_machine):
     # the agent forwarding is required for the ssh command to the destination
