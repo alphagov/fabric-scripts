@@ -20,7 +20,7 @@ def validate_classes(campaign_class):
     """Checks that the campaign class is valid"""
     if campaign_class in CAMPAIGN_CLASSES:
         return campaign_class
-    raise Exception, "Invalid class {}, valid values are {}".format(campaign_class, CAMPAIGN_CLASSES)
+    raise Exception("Invalid class {}, valid values are {}".format(campaign_class, CAMPAIGN_CLASSES))
 
 
 @runs_once
