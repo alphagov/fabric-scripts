@@ -98,8 +98,8 @@ def reset_slave():
     run_mysql_command("RESET SLAVE;")
 
     # Repoint log file and position to last known values
-    run_mysql_command("CHANGE MASTER TO MASTER_LOG_FILE='{}', MASTER_LOG_POS={};" \
-            .format(master_log_file, master_log_pos))
+    run_mysql_command("CHANGE MASTER TO MASTER_LOG_FILE='{}', MASTER_LOG_POS={};"
+                      .format(master_log_file, master_log_pos))
     run_mysql_command("START SLAVE;")
 
     with hide('everything'):
@@ -107,8 +107,8 @@ def reset_slave():
 
     # Compare as a string to ensure we got a non-nil value from MySQL
     if seconds_behind_master != '0':
-        abort("Slave is still behind master by {} seconds; run mysql.slave_status to check status" \
-                .format(seconds_behind_master))
+        abort("Slave is still behind master by {} seconds; run mysql.slave_status to check status"
+              .format(seconds_behind_master))
 
 
 @task

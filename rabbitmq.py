@@ -2,6 +2,7 @@ from fabric.api import *
 from time import sleep
 import re
 
+
 @task
 @roles('class-rabbitmq')
 def status():

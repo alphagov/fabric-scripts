@@ -3,18 +3,22 @@ from fabric.api import *
 import util
 
 SEARCHABLE_APPS = {
-    'calendars':             ('frontend', ['panopticon:register']),
-    'designprinciples':      ('frontend', ['rummager:index']), # Includes the service-manual. Note: not included in gov.uk/search
-    'frontend':              ('frontend', ['rummager:index']),
-    'licencefinder':         ('frontend', ['panopticon:register']),
-    'businesssupportfinder': ('frontend', ['panopticon:register']),
-    'publisher':             ('backend',  ['panopticon:register']),
-    'recommended-links':     ('backend',  ['rummager:index']),
-    'smartanswers':          ('frontend', ['panopticon:register']),
-    'tariff':                ('frontend', ['panopticon:register']),
-    'travel-advice-publisher':('backend', ['panopticon:register', 'panopticon:reregister_editions']),
-    'whitehall':             ('whitehall_backend',  ['rummager:index']),
+    'calendars':               ('frontend',          ['panopticon:register']),
+
+    # Includes the service-manual. Note: not included in gov.uk/search
+    'designprinciples':        ('frontend',          ['rummager:index']),
+
+    'frontend':                ('frontend',          ['rummager:index']),
+    'licencefinder':           ('frontend',          ['panopticon:register']),
+    'businesssupportfinder':   ('frontend',          ['panopticon:register']),
+    'publisher':               ('backend',           ['panopticon:register']),
+    'recommended-links':       ('backend',           ['rummager:index']),
+    'smartanswers':            ('frontend',          ['panopticon:register']),
+    'tariff':                  ('frontend',          ['panopticon:register']),
+    'travel-advice-publisher': ('backend',           ['panopticon:register', 'panopticon:reregister_editions']),
+    'whitehall':               ('whitehall_backend', ['rummager:index']),
 }
+
 
 @task
 def list():
@@ -22,6 +26,7 @@ def list():
 
     for app in sorted(SEARCHABLE_APPS.keys()):
         puts(app)
+
 
 @task
 def reindex(app=None):

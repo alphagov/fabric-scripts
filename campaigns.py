@@ -20,7 +20,7 @@ def validate_classes(campaign_class):
     """Checks that the campaign class is valid"""
     if campaign_class in CAMPAIGN_CLASSES:
         return campaign_class
-    raise Exception, "Invalid class {}, valid values are {}".format(campaign_class, CAMPAIGN_CLASSES)
+    raise Exception("Invalid class {}, valid values are {}".format(campaign_class, CAMPAIGN_CLASSES))
 
 
 @runs_once
@@ -35,7 +35,7 @@ def set_context():
 
 def template(app):
     if app == 'frontend':
-      template = Template("""<div id="campaign" class="{{ campaign_class }}">
+        template = Template("""<div id="campaign" class="{{ campaign_class }}">
     <div class="campaign-inner">
       <h1>{{ heading|e }}</h1>
       <p>{{ extra_info|e }}</p>
@@ -43,7 +43,7 @@ def template(app):
     </div>
   </div>""")
     elif app == 'static':
-      template = Template("""<p>{{ heading|e }}<br />
+        template = Template("""<p>{{ heading|e }}<br />
     {{ extra_info|e }}</p>
   <a href="#" class="right">{{ more_info|e }}</a>""")
 
@@ -60,6 +60,7 @@ def deploy_banner(application):
     put(StringIO.StringIO(content), remote_filename, use_sudo=True, mirror_local_mode=True)
     sudo('chown deploy:deploy %s' % remote_filename)
     execute(app.reload, application)
+
 
 def remove_banner(application):
     if application == 'frontend':
@@ -80,6 +81,7 @@ def deploy_emergency_banner():
     execute(set_context)
     for application in APPLICATIONS:
         deploy_banner(application)
+
 
 @task
 @roles('class-frontend')

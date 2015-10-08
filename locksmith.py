@@ -6,9 +6,11 @@ import util
 etcd_cluster = 'http://etcd-1.management:4001,http://etcd-2.management:4001,http://etcd-3.management:4001'
 locksmithctl = '/usr/bin/locksmithctl'
 
+
 def check_locksmithctl():
     if not fabric.contrib.files.exists(locksmithctl):
         error('locksmithctl is not installed. Perhaps unattended_reboots are disabled?')
+
 
 @task
 def status():
@@ -16,6 +18,7 @@ def status():
     util.use_random_host('class-etcd')
     check_locksmithctl()
     run("{0} -endpoint='{1}' status".format(locksmithctl, etcd_cluster))
+
 
 @task
 def unlock(machine_name):

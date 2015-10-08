@@ -1,6 +1,7 @@
 from fabric.api import *
 import util
 
+
 @task
 def change(old_url, new_url):
     """Change a mainstream slug. Usage: fab preview mainstream_slugs.change:old_slug=/old-slug,new_slug=/new-slug"""

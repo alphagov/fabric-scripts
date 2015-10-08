@@ -5,12 +5,13 @@ import app
 import nginx
 import puppet
 
+
 @task
 def update_database():
     """Update a Mapit database using a new database dump"""
 
     if len(env.hosts) > 1:
-      exit('This command should only be run on one Mapit machine at a time')
+        exit('This command should only be run on one Mapit machine at a time')
 
     execute(nginx.gracefulstop)
     execute(app.stop, 'mapit')
@@ -19,7 +20,7 @@ def update_database():
     sudo('rm /data/vhost/mapit/data/mapit.sql.gz')
 
     with settings(sudo_user='postgres'):
-      sudo("psql -c 'DROP DATABASE mapit;'")
+        sudo("psql -c 'DROP DATABASE mapit;'")
 
     execute(puppet.agent, '--test')
 

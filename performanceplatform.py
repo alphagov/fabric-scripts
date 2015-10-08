@@ -61,8 +61,7 @@ def get_command(query_path, query):
 
     pp_collector = './venv/bin/pp-collector'
     credentials_path = './config/credentials/{}.json'.format(credentials)
-    token_path = './config/tokens/{}.json'.format(
-    query['token'])
+    token_path = './config/tokens/{}.json'.format(query['token'])
     platform_path = './config/performanceplatform.json'
 
     return '{} -q {} -c {} -t {} -b {} --console-logging'.format(

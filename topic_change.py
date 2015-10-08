@@ -69,6 +69,7 @@ def move_in_panopticon(source_topic, destination_topic):
     """
     do_move_in_panopticon(source_topic, destination_topic)
 
+
 def do_move_in_panopticon(source_topic, destination_topic):
     util.use_random_host('class-backend')
     print("\nRetagging content on %s" % (api.env.host_string,))
@@ -82,6 +83,7 @@ def delete_topic(old_topic):
 
     """
     do_delete_topic(old_topic)
+
 
 def do_delete_topic(old_topic):
     util.use_random_host('class-backend')
@@ -173,7 +175,7 @@ def prepare_whitehall_csv(output_directory, source_topic, destination_topic):
               SOURCE=source_topic,
               DESTINATION=destination_topic,
               CSV_LOCATION=remote_path,
-    )
+              )
     api.get(remote_path, os.path.join(output_directory, filename))
     api.sudo("rm '%s'" % (remote_path,), user="deploy")
 

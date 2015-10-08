@@ -1,7 +1,5 @@
 from urllib import quote_plus
-from StringIO import StringIO
 import json
-import string
 
 from fabric.api import *
 
@@ -26,7 +24,7 @@ def _monitoring_hostname(host):
 
 @task
 @hosts(['alert.cluster'])
-def schedule_downtime(host,minutes='20'):
+def schedule_downtime(host, minutes='20'):
     """Schedules downtime for a host in nagios; default for 20 minutes"""
 
     # get timestamp from monitoring server to avoid clock skew issues.
