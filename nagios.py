@@ -76,7 +76,7 @@ def loadhosts(search_string=''):
             abort('Could not connect to monitoring service')
 
     hosts = [
-        service['host_name'].split('.production').pop(0)
+        service['host_name']
         for service in json.loads(resp)['status']['service_status']
     ]
 
