@@ -80,6 +80,9 @@ def loadhosts(search_string=''):
         for service in json.loads(resp)['status']['service_status']
     ]
 
+    if len(hosts) == 0:
+        exit('No hosts were found with that search')
+
     print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
     prompt("Type 'yes' to confirm: ", validate="yes")
     env.hosts = hosts
