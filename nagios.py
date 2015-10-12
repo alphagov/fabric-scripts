@@ -80,6 +80,8 @@ def loadhosts(search_string=''):
         for service in json.loads(resp)['status']['service_status']
     ]
 
+    hosts = sorted(set(hosts))
+
     if len(hosts) == 0:
         exit('No hosts were found with that search')
 
