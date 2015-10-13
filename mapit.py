@@ -13,15 +13,21 @@ def update_database():
     if len(env.hosts) > 1:
         exit('This command should only be run on one Mapit machine at a time')
 
+    # Stop NginX so that no requests reach this machine
     execute(nginx.gracefulstop)
+    # Stop mapit and collectd which are using the Mapit database so that we can drop it
     execute(app.stop, 'mapit')
     sudo('service collectd stop')
 
+    # Delete the old sql dump to force a new download
     sudo('rm /data/vhost/mapit/data/mapit.sql.gz')
 
+    # Drop the existing mapit database
     with settings(sudo_user='postgres'):
         sudo("psql -c 'DROP DATABASE mapit;'")
 
+    # Run puppet, which will download the database dump, recreate the Mapit
+    # database using the dump and start the services which were stopped earlier
     execute(puppet.agent, '--test')
 
 
