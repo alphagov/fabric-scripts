@@ -76,9 +76,14 @@ def loadhosts(search_string=''):
             abort('Could not connect to monitoring service')
 
     hosts = [
-        service['host_name'].split('.production').pop(0)
+        service['host_name']
         for service in json.loads(resp)['status']['service_status']
     ]
+
+    hosts = sorted(set(hosts))
+
+    if len(hosts) == 0:
+        exit('No hosts were found with that search')
 
     print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
     prompt("Type 'yes' to confirm: ", validate="yes")
