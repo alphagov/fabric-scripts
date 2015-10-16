@@ -45,7 +45,7 @@ def template(app):
     elif app == 'static':
         template = Template("""<p>{{ heading|e }}<br />
     {{ extra_info|e }}</p>
-  <a href="#" class="right">{{ more_info|e }}</a>""")
+  <a href="{{ more_info|e }}" class="right">More information</a>""")
 
     env['template_contents'] = template.render(env.context)
 
