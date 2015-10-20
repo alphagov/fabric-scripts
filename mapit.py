@@ -18,6 +18,8 @@ def update_database():
     # Stop mapit and collectd which are using the Mapit database so that we can drop it
     execute(app.stop, 'mapit')
     sudo('service collectd stop')
+    # Make sure that cached mapit responses are cleared when the database is updated
+    sudo('service memcached restart')
 
     # Delete the old sql dump to force a new download
     sudo('rm /data/vhost/mapit/data/mapit.sql.gz')
