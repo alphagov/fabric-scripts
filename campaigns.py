@@ -50,6 +50,26 @@ def template(app):
     env['template_contents'] = template.render(env.context)
 
 
+def clear_static_generated_templates():
+    """
+    Our various frontend applications use the wrapper.html.erb and
+    header_footer_only.html.erb templates. They get these templates
+    using the Slimmer gem. And this gem fetches these templates from
+    the static application, located using the ASSET_ROOT.
+
+    When static is deployed there are no generated wrapper.html.erb or
+    header_footer_only.html.erb templates. At the first request of
+    either of these, the application will generate the template. The
+    template will be placed in the public/template directory. From
+    that point on, the templates are served by nginx.
+
+    This function clears the public/template directory to force it to
+    be regenerated to include the emergency campaign.
+    """
+    for template in ('wrapper.html.erb', 'header_footer_only.html.erb'):
+        sudo('rm /var/apps/static/public/templates/{}'.format(template))
+
+
 def deploy_banner(application):
     execute(template, application)
     if application == 'frontend':
@@ -59,6 +79,8 @@ def deploy_banner(application):
     content = env['template_contents']
     put(StringIO.StringIO(content), remote_filename, use_sudo=True, mirror_local_mode=True)
     sudo('chown deploy:deploy %s' % remote_filename)
+    if application == 'static':
+        clear_static_generated_templates()
     execute(app.reload, application)
 
 
@@ -71,6 +93,8 @@ def remove_banner(application):
     for remote_filename in remote_filenames:
         put(StringIO.StringIO(content), remote_filename, use_sudo=True, mirror_local_mode=True)
         sudo('chown deploy:deploy %s' % remote_filename)
+    if application == 'static':
+        clear_static_generated_templates()
     execute(app.reload, application)
 
 
