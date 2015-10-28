@@ -28,7 +28,7 @@ def set_context():
     env['context'] = {
         'heading': prompt("Heading for campaign:", 'heading'),
         'extra_info': prompt("Extra information for campaign:", 'extra_info'),
-        'more_info': prompt("Link for more information:", 'more_info'),
+        'more_info_url': prompt("Link for more information:", 'more_info_url'),
         'campaign_class': prompt("Campaign class:", 'campaign_class', validate=validate_classes)
     }
 
@@ -39,13 +39,13 @@ def template(app):
     <div class="campaign-inner">
       <h1>{{ heading|e }}</h1>
       <p>{{ extra_info|e }}</p>
-      <a href="{{ more_info|e }}">More information</a>
+      <a href="{{ more_info_url|e }}">More information</a>
     </div>
   </div>""")
     elif app == 'static':
         template = Template("""<p>{{ heading|e }}<br />
     {{ extra_info|e }}</p>
-  <a href="{{ more_info|e }}" class="right">More information</a>""")
+  <a href="{{ more_info_url|e }}" class="right">More information</a>""")
 
     env['template_contents'] = template.render(env.context)
 

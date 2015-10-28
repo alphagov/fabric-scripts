@@ -11,6 +11,21 @@ def purge(*args):
 
 @task
 @roles('class-cache', 'class-draft_cache')
+def ban_all():
+    """
+    Invalidate all current cached objects in varnish.
+
+    Note that this will not delete existing objects but does prevent them from being served.
+    We use it instead of purging because it's more efficient when invalidating a large
+    number of objects, i.e. all objects.
+
+    See: https://www.varnish-cache.org/docs/3.0/tutorial/purging.html
+    """
+    sdo("sudo varnishadm 'ban req.url ~ .'")
+
+
+@task
+@roles('class-cache', 'class-draft_cache')
 def restart():
     """
     Restart Varnish caches
