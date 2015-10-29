@@ -21,7 +21,7 @@ def ban_all():
 
     See: https://www.varnish-cache.org/docs/3.0/tutorial/purging.html
     """
-    sdo("sudo varnishadm 'ban req.url ~ .'")
+    sudo("sudo varnishadm 'ban req.url ~ .'")
 
 
 @task
