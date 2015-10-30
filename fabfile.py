@@ -290,6 +290,14 @@ def puppet_class(*class_names):
 
 
 @task
+@runs_once
+def application(app_name):
+    """Select all machines which host a given application"""
+    class_name = 'govuk::apps::{}'.format(app_name.replace('-', '_'))
+    puppet_class(class_name)
+
+
+@task
 @hosts('localhost')
 def node_type(node_name):
     """Select all machines of a given node type"""
