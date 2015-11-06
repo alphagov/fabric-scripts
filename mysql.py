@@ -92,6 +92,8 @@ def replicate_slave_from_master(master):
     print('Importing MySQL database which is {0}GB, this might take a while...'.format(round(int(database_file_size) / (1024*1024*1024*1.0), 1)))
     run('sudo -i mysql -uroot < dump.sql')
 
+    run('rm dump.sql')
+
     run_mysql_command("START SLAVE")
     run_mysql_command("SET GLOBAL slow_query_log=ON")
 
