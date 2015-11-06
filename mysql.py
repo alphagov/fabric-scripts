@@ -1,4 +1,5 @@
 from fabric.api import *
+from fabric.operations import prompt
 
 
 def run_mysql_command(cmd):
@@ -40,13 +41,36 @@ def fix_replication_from_slow_query_log_after_upgrade():
 @task
 def setup_slave_from_master(master):
     """
-    Sets up a slave from a master by taking a dump from the master,
-    copying it to the slave and then restoring the dump.
+    Sets up a slave from a master by:
+      - configuring MySQL replication config
+      - using the replicate_slave_from_master task to do an initial dump to the slave
 
     Usage: fab environment -H mysql-slave-1.backend mysql.setup_slave_from_master:'mysql-master-1.backend'
     """
     if len(env.hosts) > 1:
-        print 'This job is currently only setup to run against one slave at a time'
+        exit('This job is currently only setup to run against one slave at a time')
+
+    mysql_master = prompt("Master host (eg 'master.mysql' or 'whitehall-master.mysql'):")
+    replication_username = 'replica_user'
+    replication_password = prompt("Password for MySQL user {0}:".format(replication_username))
+
+    run_mysql_command("STOP SLAVE;")
+    run_mysql_command("CHANGE MASTER TO MASTER_HOST='{0}', MASTER_USER='{1}', MASTER_PASSWORD='{2}';".format(
+        mysql_master, replication_username, replication_password))
+
+    replicate_slave_from_master(master)
+
+
+@task
+def replicate_slave_from_master(master):
+    """
+    Updates a slave from a master by taking a dump from the master,
+    copying it to the slave and then restoring the dump.
+
+    Usage: fab environment -H mysql-slave-1.backend mysql.replicate_slave_from_master:'mysql-master-1.backend'
+    """
+    if len(env.hosts) > 1:
+        exit('This job is currently only setup to run against one slave at a time')
 
     with settings(host_string=master):
         # The use of `--master-data` here implies `--lock-all-tables` per the
@@ -62,7 +86,13 @@ def setup_slave_from_master(master):
     run_mysql_command("STOP SLAVE")
     run_mysql_command("SET GLOBAL slow_query_log=OFF")
 
+    with hide('running', 'stdout'):
+        database_file_size = run("stat --format='%s' dump.sql")
+
+    print('Importing MySQL database which is {0}GB, this might take a while...'.format(round(int(database_file_size) / (1024*1024*1024*1.0), 1)))
     run('sudo -i mysql -uroot < dump.sql')
+
+    run('rm dump.sql')
 
     run_mysql_command("START SLAVE")
     run_mysql_command("SET GLOBAL slow_query_log=ON")
