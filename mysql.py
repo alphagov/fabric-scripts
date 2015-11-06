@@ -46,7 +46,7 @@ def setup_slave_from_master(master):
     Usage: fab environment -H mysql-slave-1.backend mysql.setup_slave_from_master:'mysql-master-1.backend'
     """
     if len(env.hosts) > 1:
-        print 'This job is currently only setup to run against one slave at a time'
+        exit('This job is currently only setup to run against one slave at a time')
 
     with settings(host_string=master):
         # The use of `--master-data` here implies `--lock-all-tables` per the
