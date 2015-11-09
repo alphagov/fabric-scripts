@@ -1,4 +1,5 @@
 from fabric.api import *
+from time import sleep
 
 
 def puppet(*args):
@@ -45,3 +46,15 @@ def lookup_hieradata(key):
     config_file = '{0}/hiera.yml'.format(puppet_directory)
     variables = '::environment=production ::lsbdistcodename=precise ::settings::manifestdir={0}/manifests'.format(puppet_directory)
     run('hiera --config {0} {1} {2}'.format(config_file, key, variables))
+
+
+@task
+@hosts('puppetmaster-1.management')
+def sign_certificates():
+    """Sign Puppet certificates on the Puppetmaster when launching machines"""
+    print('Signing certificates in a loop. Cancel this command to stop signing certificates.')
+    while True:
+        # 24 is the exit code that Puppet returns when there are no waiting certificate requests to sign
+        with settings(ok_ret_codes=[0, 24]):
+            sudo('puppet cert sign --all')
+        sleep(10)
