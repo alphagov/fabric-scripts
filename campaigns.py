@@ -12,7 +12,7 @@ import app
 env['eagerly_disconnect'] = True
 
 
-APPLICATIONS = ['frontend', 'static']
+APPLICATIONS = ['static', 'frontend']
 CAMPAIGN_CLASSES = ['red', 'black', 'green']
 
 
