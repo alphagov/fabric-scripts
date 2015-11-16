@@ -12,7 +12,7 @@ import app
 env['eagerly_disconnect'] = True
 
 
-APPLICATIONS = ['frontend', 'static']
+APPLICATIONS = ['static', 'frontend']
 CAMPAIGN_CLASSES = ['red', 'black', 'green']
 
 
@@ -28,7 +28,7 @@ def set_context():
     env['context'] = {
         'heading': prompt("Heading for campaign:", 'heading'),
         'extra_info': prompt("Extra information for campaign:", 'extra_info'),
-        'more_info_url': prompt("Link for more information:", 'more_info_url'),
+        'more_info_url': prompt("URL for more information:", 'more_info_url'),
         'campaign_class': prompt("Campaign class:", 'campaign_class', validate=validate_classes)
     }
 
