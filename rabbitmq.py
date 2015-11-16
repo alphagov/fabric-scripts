@@ -67,3 +67,9 @@ def safe_reboot():
 
     execute(vm.reboot, hosts=[env['host_string']])
     sleep(10)
+
+@task
+@roles('class-rabbitmq')
+def open_fd():
+    """Show the number of open files rabbitmq is holding"""
+    sudo('lsof -a -p $(pidof beam.smp) |wc -l')
