@@ -250,6 +250,14 @@ def staging():
 
 
 @task
+def integration():
+    """Select integration environment"""
+    env['environment'] = 'integration'
+    _set_gateway('integration.publishing.service.gov.uk')
+
+
+# FIXME: Remove once Preview environment is deleted
+@task
 def preview():
     """Select preview environment"""
     env['environment'] = 'preview'
