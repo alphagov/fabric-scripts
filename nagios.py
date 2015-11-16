@@ -14,12 +14,12 @@ def submit_nagios_cmd(command):
 
 def _monitoring_hostname(host):
     """Returns the canonical name (according to our monitoring) for a host"""
-    if env['environment'] == 'preview':
-        return "%s.production" % host
-    elif env['environment'] == 'staging':
-        return "{0}.staging.publishing.service.gov.uk".format(host)
-    else:
+    if env['environment'] == 'production':
         return "{0}.publishing.service.gov.uk".format(host)
+    elif env['environment'] == 'preview': # FIXME: Remove once Preview is deleted
+        return "%s.production" % host
+    else:
+        return "{0}.{1}.publishing.service.gov.uk".format(host, env['environment'])
 
 
 @task

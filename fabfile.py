@@ -104,8 +104,8 @@ class RoleFetcher(object):
                 continue
 
             # Don't refer to foo.bar.production, as it's confusing when doing
-            # things in preview or staging. Refer to the machines exclusively by
-            # short name.
+            # things in integration or staging. Refer to the machines
+            # exclusively by short name.
             short_host = '{0}.{1}'.format(name, vdc)
 
             cls = name.rstrip('-1234567890').replace('-', '_')
@@ -249,6 +249,14 @@ def staging():
     _set_gateway('staging.publishing.service.gov.uk')
 
 
+@task
+def integration():
+    """Select integration environment"""
+    env['environment'] = 'integration'
+    _set_gateway('integration.publishing.service.gov.uk')
+
+
+# FIXME: Remove once Preview environment is deleted
 @task
 def preview():
     """Select preview environment"""

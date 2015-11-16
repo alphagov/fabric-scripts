@@ -62,11 +62,11 @@ def bodge_unicorn(name):
 
     e.g. To kill off and restart contentapi on backend-1 in Preview:
 
-      fab preview -H backend-1.backend vm.bodge_unicorn:contentapi
+      fab integration -H backend-1.backend vm.bodge_unicorn:contentapi
 
     ...or on all backend hosts in Preview:
 
-      fab preview class:backend vm.bodge_unicorn:contentapi
+      fab integration class:backend vm.bodge_unicorn:contentapi
 
     Yes. This is a bodge. Sorry.
     """

@@ -32,10 +32,10 @@ You can view a list of the available tasks:
 
 And execute against an environment and set of hosts like so:
 
-    $ fab preview all hosts
+    $ fab integration all hosts
     ...
-    $ fab preview class:frontend do:'uname -a'
-    $ fab preview class:cache,bouncer do:uptime
+    $ fab integration class:frontend do:'uname -a'
+    $ fab integration class:cache,bouncer do:uptime
     ...
 
 ### Targetting groups of machines
@@ -45,17 +45,17 @@ Fabric tasks can be run on groups of machines in a variety of different ways.
 by puppet class
 
     # target all machines that have the 'govuk::safe_to_reboot::yes' class
-    $ fab preview puppet_class:govuk::safe_to_reboot::yes do:'uname -a'
+    $ fab integration puppet_class:govuk::safe_to_reboot::yes do:'uname -a'
 
 by numeric machine suffix
 
     # target all machines that end in '2'
-    $ fab preview numbered:2 do:'uname -a'
+    $ fab integration numbered:2 do:'uname -a'
 
 by node type (as defined in puppet)
 
     # target all 'frontend' machines
-    $ fab preview node_type:frontend do:'uname -a'
+    $ fab integration node_type:frontend do:'uname -a'
 
 by the node name
 
