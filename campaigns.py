@@ -29,7 +29,7 @@ def set_context():
         'heading': prompt("Heading for campaign:", 'heading'),
         'extra_info': prompt("Extra information for campaign:", 'extra_info'),
         'more_info_url': prompt("URL for more information:", 'more_info_url'),
-        'campaign_class': prompt("Campaign class (eg black, red or green):", 'campaign_class', validate=validate_classes)
+        'campaign_class': prompt("Campaign class (one of {}):".format(", ".join(CAMPAIGN_CLASSES)), 'campaign_class', validate=validate_classes)
     }
 
 
