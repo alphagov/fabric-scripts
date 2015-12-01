@@ -1,4 +1,4 @@
-from fabric.api import task, settings, sudo, env, run
+from fabric.api import task, settings, sudo, env, run, cd
 from fabric.tasks import execute
 
 import app
@@ -7,19 +7,13 @@ import puppet
 
 
 @task
-def update_database():
-    """Update a Mapit database using a new database dump"""
+def update_database_via_puppet():
+    """Update a Mapit database from a new database dump using puppet (old mapit-server-*.backend servers)"""
 
     if len(env.hosts) > 1:
         exit('This command should only be run on one Mapit machine at a time')
 
-    # Stop NginX so that no requests reach this machine
-    execute(nginx.gracefulstop)
-    # Stop mapit and collectd which are using the Mapit database so that we can drop it
-    execute(app.stop, 'mapit')
-    sudo('service collectd stop')
-    # Make sure that cached mapit responses are cleared when the database is updated
-    sudo('service memcached restart')
+    _stop_mapit_services()
 
     # Delete the old sql dump to force a new download
     sudo('rm /data/vhost/mapit/data/mapit.sql.gz')
@@ -28,8 +22,42 @@ def update_database():
     with settings(sudo_user='postgres'):
         sudo("psql -c 'DROP DATABASE mapit;'")
 
-    # Run puppet, which will download the database dump, recreate the Mapit
-    # database using the dump and start the services which were stopped earlier
+    _restart_mapit_services()
+
+
+@task
+def update_database_via_app():
+    """Update a Mapit database from a new database dump using scripts in the app (new mapit-*.api servers)"""
+
+    if len(env.hosts) > 1:
+        exit('This command should only be run on one Mapit machine at a time')
+
+    _stop_mapit_services()
+
+    # This script needs to run as a user that can sudo to become the postgres
+    # user.  It's easiest if this is passwordless, so we can't use the
+    # `command` helper to run the script as that becomes the deploy user who
+    # can't sudo without a password
+    with cd('/var/apps/mapit'):
+        run('govuk_setenv mapit ./import-db-from-s3.sh')
+
+    _restart_mapit_services()
+
+
+def _stop_mapit_services():
+    # Stop NginX so that no requests reach this machine
+    execute(nginx.gracefulstop)
+    # Stop mapit and collectd which are using the Mapit database so that we can drop it
+    execute(app.stop, 'mapit')
+    sudo('service collectd stop')
+    # Make sure that cached mapit responses are cleared when the database is updated
+    sudo('service memcached restart')
+
+
+def _restart_mapit_services():
+    # Run puppet, which will restart the services which were stopped earlier.
+    # On old mapit servers this will also download and recreate the db if we've
+    # deleted them.
     execute(puppet.agent)
 
 
