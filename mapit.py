@@ -22,7 +22,10 @@ def update_database_via_puppet():
     with settings(sudo_user='postgres'):
         sudo("psql -c 'DROP DATABASE mapit;'")
 
-    _restart_mapit_services()
+    # Run puppet, this will download and recreate the db from the dump and then
+    # restart the services we stopped, in the puppet defined order.
+    execute(puppet.enable)
+    execute(puppet.agent)
 
 
 @task
@@ -58,11 +61,12 @@ def _stop_mapit_services():
 
 
 def _restart_mapit_services():
+    # Restart services in reverse order so that nginx comes up last - we don't
+    # want to start sending traffic to the app before the app itself is running
+    sudo('service collectd start')
+    execute(app.start, 'mapit')
+    execute(nginx.start)
     execute(puppet.enable)
-    # Run puppet, which will restart the services which were stopped earlier.
-    # On old mapit servers this will also download and recreate the db if we've
-    # deleted them.
-    execute(puppet.agent)
 
 
 @task
