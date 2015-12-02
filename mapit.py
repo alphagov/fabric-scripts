@@ -45,6 +45,9 @@ def update_database_via_app():
 
 
 def _stop_mapit_services():
+    # Stop puppet so that any scheduled runs don't happen while we are doing
+    # our work
+    execute(puppet.disable, 'Updating mapit database which requires stopping some services we would not want a scheduled puppet run to restart before we were done')
     # Stop NginX so that no requests reach this machine
     execute(nginx.gracefulstop)
     # Stop mapit and collectd which are using the Mapit database so that we can drop it
@@ -55,6 +58,7 @@ def _stop_mapit_services():
 
 
 def _restart_mapit_services():
+    execute(puppet.enable)
     # Run puppet, which will restart the services which were stopped earlier.
     # On old mapit servers this will also download and recreate the db if we've
     # deleted them.
