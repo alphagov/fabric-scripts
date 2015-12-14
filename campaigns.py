@@ -52,21 +52,20 @@ def template(app):
 
 def clear_static_generated_templates():
     """
-    Our various frontend applications use the wrapper.html.erb and
-    header_footer_only.html.erb templates. They get these templates
-    using the Slimmer gem. And this gem fetches these templates from
-    the static application, located using the ASSET_ROOT.
+    Our various frontend applications use the wrapper.html.erb,
+    header_footer_only.html.erb and core_layout.html.erb layout templates.
+    They get these templates using the Slimmer gem, which fetches
+    these templates from the static application, located using ASSET_ROOT.
 
-    When static is deployed there are no generated wrapper.html.erb or
-    header_footer_only.html.erb templates. At the first request of
-    either of these, the application will generate the template. The
-    template will be placed in the public/template directory. From
-    that point on, the templates are served by nginx.
+    When static is deployed there are no generated layout templates
+    on static At the first request to one these, static will generate
+    the template. The template will be placed in the public/template
+    directory. From that point on, the templates are served by nginx.
 
     This function clears the public/template directory to force it to
     be regenerated to include the emergency campaign.
     """
-    for template in ('wrapper.html.erb', 'header_footer_only.html.erb'):
+    for template in ('wrapper.html.erb', 'header_footer_only.html.erb', 'core_layout.html.erb'):
         sudo('rm /var/apps/static/public/templates/{}'.format(template))
 
 
