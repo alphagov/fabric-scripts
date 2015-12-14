@@ -78,9 +78,9 @@ def deploy_banner(application):
     content = env['template_contents']
     put(StringIO.StringIO(content), remote_filename, use_sudo=True, mirror_local_mode=True)
     sudo('chown deploy:deploy %s' % remote_filename)
+    execute(app.reload, application)
     if application == 'static':
         clear_static_generated_templates()
-    execute(app.reload, application)
 
 
 def remove_banner(application):
@@ -92,9 +92,9 @@ def remove_banner(application):
     for remote_filename in remote_filenames:
         put(StringIO.StringIO(content), remote_filename, use_sudo=True, mirror_local_mode=True)
         sudo('chown deploy:deploy %s' % remote_filename)
+    execute(app.reload, application)
     if application == 'static':
         clear_static_generated_templates()
-    execute(app.reload, application)
 
 
 @task
