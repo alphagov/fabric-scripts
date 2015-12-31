@@ -256,14 +256,6 @@ def integration():
     _set_gateway('integration.publishing.service.gov.uk')
 
 
-# FIXME: Remove once Preview environment is deleted
-@task
-def preview():
-    """Select preview environment"""
-    env['environment'] = 'preview'
-    _set_gateway('preview.alphagov.co.uk')
-
-
 @task
 def all():
     """Select all machines in current environment"""
