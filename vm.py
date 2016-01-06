@@ -16,10 +16,12 @@ def free():
     """Show memory stats"""
     run('free')
 
+
 @task
 def top_mem_proc():
     """Show top processes by memory usage"""
     run('ps aux |sort -rk4 |head')
+
 
 @task
 def disk():
