@@ -95,6 +95,7 @@ class RoleFetcher(object):
             return
 
         self.hosts = _fetch_hosts()
+        self.roledefs['disaster_recovery'] = _fetch_hosts('--dr-only')
 
         for host in self.hosts:
             try:
@@ -309,6 +310,12 @@ def node_type(node_name):
 def vdc(vdc_name):
     """Select a virtual datacentre"""
     env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
+
+
+@task
+def disaster_recovery():
+    """Select disaster recovery machines"""
+    env.hosts.extend(env.roledefs['disaster_recovery']())
 
 
 @task
