@@ -1,4 +1,5 @@
 from fabric.api import sudo, task
+from util import bundle_exec
 
 
 @task
@@ -35,6 +36,12 @@ def start(app):
 def status(app):
     """Check status of a particular app"""
     _service(app, 'status')
+
+
+@task
+def rails_console(app):
+    """Attach to a Rails application's console"""
+    bundle_exec(app, 'rails console')
 
 
 def _service(app, command):
