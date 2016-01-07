@@ -19,5 +19,5 @@ def fail_to_mirror():
 def recover_origin():
     """Recovers GOV.UK to serve from origin after incident.fail_to_mirror has been invoked"""
     puppet.enable()
-    puppet.agent("--test")
+    puppet.agent()
     print("Puppet has been re-enabled, has run and the site should now be serving from origin as normal.")
