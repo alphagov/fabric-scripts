@@ -30,7 +30,7 @@ def update_database():
 
     # Run puppet, which will download the database dump, recreate the Mapit
     # database using the dump and start the services which were stopped earlier
-    execute(puppet.agent, '--test')
+    execute(puppet.agent)
 
 
 @task

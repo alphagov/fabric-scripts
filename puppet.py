@@ -3,7 +3,7 @@ from time import sleep
 
 
 def puppet(*args):
-    sudo('govuk_puppet %s' % ' '.join(args))
+    sudo('govuk_puppet --test %s' % ' '.join(args))
 
 
 @task(default=True)
