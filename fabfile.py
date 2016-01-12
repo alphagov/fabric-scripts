@@ -263,7 +263,7 @@ def all():
     env.hosts.extend(env.roledefs['all']())
 
 
-@task
+@task(alias='num')
 @runs_once
 @serial
 def numbered(number):
