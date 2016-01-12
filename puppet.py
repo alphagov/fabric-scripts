@@ -55,6 +55,6 @@ def sign_certificates():
     print('Signing certificates in a loop. Cancel this command to stop signing certificates.')
     while True:
         # 24 is the exit code that Puppet returns when there are no waiting certificate requests to sign
-        with settings(ok_ret_codes=[0, 24]):
+        with settings(hide('running'), ok_ret_codes=[0, 24]):
             sudo('puppet cert sign --all')
         sleep(10)
