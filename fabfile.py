@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from collections import defaultdict
+from git import Repo
 from hashlib import md5
 import os
 import re
@@ -211,7 +212,13 @@ def _check_repo_age():
     if not os.path.exists(REPO_OUTDATED_FILE):
         return
     if time.time() - os.path.getmtime(REPO_OUTDATED_FILE) > REPO_OUTDATED_TIME:
-        warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
+        repo = Repo(os.getcwd())
+        current_branch = repo.active_branch.name
+
+        if current_branch == 'master':
+            repo.remotes.origin.pull()
+        else:
+            warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
 
 
 def _set_gateway(jumpbox_domain):
