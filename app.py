@@ -1,5 +1,6 @@
-from fabric.api import sudo, task
+import re
 
+from fabric.api import sudo, task, run
 
 @task
 def restart(app):
@@ -39,3 +40,13 @@ def status(app):
 
 def _service(app, command):
     sudo('service {} {}'.format(app, command))
+
+
+@task
+def respawn_large_unicorns(app):
+    """Gracefully kill the unicorn worker using the most RAM for a particular app"""
+    master_pid = run('cat /var/run/{}/app.pid'.format(app))
+    if not re.match('^unicorn master', run('cat /proc/{}/cmdline'.format(master_pid))):
+        abort('App not running unicorn')
+
+    sudo("kill -QUIT $(ps -o rss,pid --ppid %s --sort +rss | tail -n1 | awk '{print $2}')" % master_pid)
