@@ -1,7 +1,7 @@
 from urllib import quote_plus
 import json
 
-from fabric.api import *
+from fabric.api import abort, env, hide, hosts, prompt, run, runs_once, sudo, task
 
 
 NAGIOS_CMD_FILE = '/var/lib/icinga/rw/nagios.cmd'

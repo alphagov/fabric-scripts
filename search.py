@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import abort, cd, puts, sudo, task
 
 import util
 
@@ -58,13 +58,13 @@ def reindex(app=None):
 def reindex_app(app):
     puts("Rebuilding search index for application '%s'" % app)
 
-    machine_class, tasks = SEARCHABLE_APPS[app]
+    machine_class, rake_tasks = SEARCHABLE_APPS[app]
     util.use_random_host('class-%s' % machine_class)
 
-    for task in tasks:
+    for rake_task in rake_tasks:
         # FIXME: Remove this horrible hack of a hack for a hack
         if app == 'recommended-links':
             with cd('/data/vhost/recommended-links.*/current'):
-                sudo('govuk_setenv default bundle exec rake -v "%s" --trace' % task, user='deploy')
+                sudo('govuk_setenv default bundle exec rake -v "%s" --trace' % rake_task, user='deploy')
         else:
-            util.rake(app, task)
+            util.rake(app, rake_task)

@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import env, execute, hide, hosts, parallel, run, sudo, task
 from fabric.utils import error
 import re
 

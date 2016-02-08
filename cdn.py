@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import env, execute, roles, run, runs_once, task
 from fabric.utils import abort
 
 import cache

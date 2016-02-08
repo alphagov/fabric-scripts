@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import abort, env, hide, run, settings, task
 from fabric.operations import prompt
 
 

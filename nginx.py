@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import abort, run, sudo, task
 import fabric.contrib.files
 import puppet
 

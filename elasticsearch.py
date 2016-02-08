@@ -1,5 +1,5 @@
 from distutils.version import StrictVersion
-from fabric.api import *
+from fabric.api import abort, env, execute, hide, run, runs_once, serial, settings, task
 from time import sleep
 import json
 import re

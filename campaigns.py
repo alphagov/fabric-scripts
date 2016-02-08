@@ -1,6 +1,6 @@
 import StringIO
 
-from fabric.api import *
+from fabric.api import env, put, roles, runs_once, sudo, task
 from fabric.operations import prompt
 from fabric.tasks import execute
 
