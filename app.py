@@ -1,6 +1,7 @@
 import re
 
-from fabric.api import sudo, task, run
+from fabric.api import abort, sudo, task, run
+
 
 @task
 def restart(app):
