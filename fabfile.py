@@ -24,7 +24,6 @@ import campaigns
 import cdn
 import elasticsearch
 import incident
-import licensify
 import locksmith
 import logstream
 import mongo
