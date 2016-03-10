@@ -68,3 +68,50 @@ def reindex_app(app):
                 sudo('govuk_setenv default bundle exec rake -v "%s" --trace' % rake_task, user='deploy')
         else:
             util.rake(app, rake_task)
+
+
+@task
+def find_latest_snapshot():
+    """Find the latest rummager snapshot"""
+    util.rake('rummager', 'rummager:snapshot:latest')
+
+
+@task
+def find_snapshot_for_date(date):
+    """Find the latest rummager snapshot before a date (YYYY-mm-dd HH:MM:SS)"""
+    util.rake('rummager', 'rummager:snapshot:latest', date)
+
+
+@task
+def list_snapshots():
+    """List rummager snapshots"""
+    util.rake('rummager', 'rummager:snapshot:list')
+
+
+@task
+def restore_snapshot(snapshot, groups_to_restore):
+    """Restore snapshots to new indices.
+
+    `groups_to_restore` is either 'all' or a comma separated list of aliases.
+    """
+    util.rake(
+        'rummager',
+        'rummager:snapshot:restore',
+        snapshot,
+        RUMMAGER_INDEX=groups_to_restore
+    )
+
+    puts(
+        "After the recovery is complete, switch to the new indexes with rummager.switch_group_to_index"
+    )
+
+
+@task
+def switch_group_to_index(group, index_name):
+    """Point a rummager index alias to a new index"""
+    util.rake(
+        'rummager',
+        'rummager:switch_to_named_index',
+        index_name,
+        RUMMAGER_INDEX=group
+    )

@@ -94,6 +94,12 @@ def wait_for_status(*allowed):
 
 
 @task
+def check_recovery(index):
+    """Check status of an index recovery"""
+    return run("curl -XGET 'http://localhost:9200/{index}/_recovery'".format(index=index))
+
+
+@task
 @serial
 def safe_reboot():
     """Reboot only if the cluster is currently green"""
