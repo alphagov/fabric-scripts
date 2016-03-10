@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import roles, task
 from fabric.tasks import execute
 import nginx
 import puppet

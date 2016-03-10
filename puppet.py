@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import env, hide, hosts, run, settings, sudo, task
 from time import sleep
 
 

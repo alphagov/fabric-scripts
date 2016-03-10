@@ -1,4 +1,4 @@
-from fabric.api import *
+from fabric.api import prompt, run, sudo, task
 
 
 @task
