@@ -27,15 +27,6 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
 @task
 @runs_once
 @roles('class-whitehall_backend')
-def unarchive_content(*edition_ids):
-    """Unarchive Whitehall content"""
-    for edition_id in edition_ids:
-        util.rake('whitehall', 'unwithdraw_edition', edition_id)
-
-
-@task
-@runs_once
-@roles('class-whitehall_backend')
 def overdue_scheduled_publications():
     """List overdue scheduled publications"""
     util.rake('whitehall', 'publishing:overdue:list')
