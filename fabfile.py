@@ -283,6 +283,7 @@ def numbered(number):
 def klass(*class_names):
     """Select a machine class"""
     for class_name in class_names:
+        class_name = class_name.replace("-", "_")
         env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 
