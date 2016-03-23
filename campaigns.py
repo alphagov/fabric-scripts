@@ -39,13 +39,18 @@ def template(app):
     <div class="campaign-inner">
       <h1>{{ heading|e }}</h1>
       <p>{{ extra_info|e }}</p>
-      <a href="{{ more_info_url|e }}">More information</a>
+
+      {% if more_info_url %}
+        <a href="{{ more_info_url|e }}">More information</a>
+      {% endif %}
     </div>
   </div>""")
     elif app == 'static':
         template = Template("""<p>{{ heading|e }}<br />
     {{ extra_info|e }}</p>
-  <a href="{{ more_info_url|e }}" class="right">More information</a>""")
+      {% if more_info_url %}
+        <a href="{{ more_info_url|e }}" class="right">More information</a>
+      {% endif %}""")
 
     env['template_contents'] = template.render(env.context)
 
