@@ -49,7 +49,7 @@ def template(app):
         template = Template("""<p>{{ heading|e }}<br />
     {{ extra_info|e }}</p>
       {% if more_info_url %}
-        <a href="{{ more_info_url|e }}" class="right">More information</a>
+        <a href="{{ more_info_url|e }}" class="more-information">More information</a>
       {% endif %}""")
 
     env['template_contents'] = template.render(env.context)
