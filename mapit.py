@@ -1,31 +1,9 @@
-from fabric.api import task, settings, sudo, env, run, cd
+from fabric.api import task, sudo, env, run, cd
 from fabric.tasks import execute
 
 import app
 import nginx
 import puppet
-
-
-@task
-def update_database_via_puppet():
-    """Update a Mapit database from a new database dump using puppet (old mapit-server-*.backend servers)"""
-
-    if len(env.hosts) > 1:
-        exit('This command should only be run on one Mapit machine at a time')
-
-    _stop_mapit_services()
-
-    # Delete the old sql dump to force a new download
-    sudo('rm /data/vhost/mapit/data/mapit.sql.gz')
-
-    # Drop the existing mapit database
-    with settings(sudo_user='postgres'):
-        sudo("psql -c 'DROP DATABASE mapit;'")
-
-    # Run puppet, this will download and recreate the db from the dump and then
-    # restart the services we stopped, in the puppet defined order.
-    execute(puppet.enable)
-    execute(puppet.agent)
 
 
 @task
