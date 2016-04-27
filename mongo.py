@@ -202,7 +202,7 @@ def safe_reboot():
     if i_am_primary(primary):
         execute(step_down_primary)
 
-    for i in range(5):
+    for i in range(10):
         if cluster_is_ok() and not i_am_primary():
             break
         sleep(1)
