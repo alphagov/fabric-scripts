@@ -14,3 +14,8 @@ def sync(database, dest_machine):
         run('sudo -iupostgres pg_dump -Fc {0} | ssh {1} '
             '"sudo -upostgres pg_restore --clean --single-transaction '
             '--schema public --dbname {0}"'.format(database, dest_machine))
+
+
+@task
+def push_s3_backup():
+    run('sudo -iu postgres /usr/local/bin/wal-e_postgres_base_backup_push')
