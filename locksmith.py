@@ -3,7 +3,7 @@ from fabric.utils import error
 import fabric.contrib.files
 import util
 
-etcd_cluster = 'http://etcd-1.management:4001,http://etcd-2.management:4001,http://etcd-3.management:4001'
+etcd_cluster = 'http://etcd-1.management:4001'
 locksmithctl = '/usr/bin/locksmithctl'
 
 
