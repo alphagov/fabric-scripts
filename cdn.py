@@ -10,7 +10,7 @@ import cache
 def fastly_purge(*args):
     "Purge items from Fastly, eg \"/one,/two,/three\". Wildcards not supported."
     if env.environment == 'production':
-        hostnames_to_purge = ['www.gov.uk', 'assets.digital.cabinet-office.gov.uk']
+        hostnames_to_purge = ['www.gov.uk', 'assets.publishing.service.gov.uk']
     elif env.environment == 'staging':
         hostnames_to_purge = ['www.staging.publishing.service.gov.uk', 'assets.staging.publishing.service.gov.uk']
 
