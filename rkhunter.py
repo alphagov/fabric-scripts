@@ -4,7 +4,7 @@ from fabric.api import sudo, task
 @task(default=True)
 def check(*args):
     """Run rkhunter on the machine"""
-    sudo('/etc/cron.daily/rkhunter-passive-check')
+    sudo('/usr/local/bin/rkhunter-passive-check')
 
 
 @task
