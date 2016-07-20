@@ -51,9 +51,9 @@ def _restart_mapit_services():
 def check_database_upgrade():
     """Replay yesterday's Mapit requests to ensure that a database upgrade works"""
 
-    sudo("awk '$9==200 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 > mapit-200s")
-    sudo("awk '$9==404 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 > mapit-404s")
-    sudo("awk '$9==302 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 > mapit-302s")
+    sudo("awk '$9==200 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-200s")
+    sudo("awk '$9==404 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-404s")
+    sudo("awk '$9==302 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-302s")
 
     print "Replaying Mapit 200s. Ensure that they are all still 200s."
     print "NOTE: Some 404s may result if internal ids have changed because /area/<code> will redirect to /area/<internal-id> - this should be a low number and for /area/ urls only"
