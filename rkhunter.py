@@ -11,3 +11,9 @@ def check(*args):
 def propupdate(*args):
     """Update rkhunter file property database on the machine"""
     sudo('/usr/bin/rkhunter --propupdate')
+
+
+@task
+def update(*args):
+    """Update rkhunter, check for updates to database files"""
+    sudo('/usr/bin/rkhunter --update')
