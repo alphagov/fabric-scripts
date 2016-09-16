@@ -6,7 +6,7 @@ from fabric.api import roles, run, sudo, task
 def purge(*args):
     "Purge items from varnish, eg \"/one,/two,/three\""
     for path in args:
-        run("curl -s -I -X PURGE http://localhost:7999%s | grep '200 Purged'" % path.strip())
+        run("curl -s -I --fail -X PURGE http://localhost:7999%s" % path.strip())
 
 
 @task
