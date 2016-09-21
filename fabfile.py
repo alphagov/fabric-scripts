@@ -231,6 +231,20 @@ def _set_gateway(jumpbox_domain):
     env.roledefs.fetch()
 
 
+def _replace_environment_hostnames(environment):
+    """
+    Users regularly specify environment as the suffix of a hostname when
+    sshing into a machine, thus a very common mistake is that fab processes
+    specify the host name with the environment. This replaces the environment
+    part of the host name and warns the user
+    """
+    suffix = "." + environment
+    for key, host in enumerate(env.hosts):
+        if host.endswith(suffix):
+            warn("host %s contains the environment which will automatically be removed" % host)
+            env.hosts[key] = host[:-len(suffix)]
+
+
 @task
 def help(name):
     """Show extended help for a task (e.g. 'fab help:search.reindex')"""
@@ -247,6 +261,7 @@ def production():
     """Select production environment"""
     env['environment'] = 'production'
     _set_gateway('publishing.service.gov.uk')
+    _replace_environment_hostnames('production')
 
 
 @task
@@ -254,6 +269,7 @@ def staging():
     """Select staging environment"""
     env['environment'] = 'staging'
     _set_gateway('staging.publishing.service.gov.uk')
+    _replace_environment_hostnames('staging')
 
 
 @task
@@ -261,6 +277,7 @@ def integration():
     """Select integration environment"""
     env['environment'] = 'integration'
     _set_gateway('integration.publishing.service.gov.uk')
+    _replace_environment_hostnames('integration')
 
 
 @task
