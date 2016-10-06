@@ -77,7 +77,7 @@ def clear_static_generated_templates():
 def deploy_banner(application):
     execute(template, application)
     if application == 'frontend':
-        remote_filename = '/var/apps/frontend/app/views/root/_campaign_notification.html.erb'
+        remote_filename = '/var/apps/frontend/app/views/homepage/_campaign_notification.html.erb'
     elif application == 'static':
         remote_filename = "/var/apps/static/app/views/notifications/banner_{}.erb".format(env.campaign_class)
     content = env['template_contents']
@@ -90,7 +90,7 @@ def deploy_banner(application):
 
 def remove_banner(application):
     if application == 'frontend':
-        remote_filenames = ['/var/apps/frontend/app/views/root/_campaign_notification.html.erb']
+        remote_filenames = ['/var/apps/frontend/app/views/homepage/_campaign_notification.html.erb']
     elif application == 'static':
         remote_filenames = ["/var/apps/static/app/views/notifications/banner_%s.erb" % i for i in CAMPAIGN_CLASSES]
     content = ''
