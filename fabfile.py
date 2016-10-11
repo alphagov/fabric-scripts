@@ -43,6 +43,8 @@ import topic_change
 import vm
 import whitehall
 
+env.use_ssh_config = True
+
 HERE = os.path.dirname(__file__)
 SSH_DIR = os.path.join(HERE, '.ssh')
 
