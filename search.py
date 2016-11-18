@@ -1,4 +1,4 @@
-from fabric.api import abort, cd, puts, sudo, task
+from fabric.api import abort, puts, task
 
 import util
 
@@ -12,7 +12,6 @@ SEARCHABLE_APPS = {
     'licencefinder':           ('frontend',          ['panopticon:register']),
     'businesssupportfinder':   ('frontend',          ['panopticon:register']),
     'publisher':               ('backend',           ['panopticon:register']),
-    'recommended-links':       ('backend',           ['rummager:index']),
     'smartanswers':            ('frontend',          ['panopticon:register']),
     'tariff':                  ('frontend',          ['panopticon:register']),
     'travel-advice-publisher': ('backend',           ['panopticon:register', 'panopticon:reregister_editions']),
@@ -62,12 +61,7 @@ def reindex_app(app):
     util.use_random_host('class-%s' % machine_class)
 
     for rake_task in rake_tasks:
-        # FIXME: Remove this horrible hack of a hack for a hack
-        if app == 'recommended-links':
-            with cd('/data/vhost/recommended-links.*/current'):
-                sudo('govuk_setenv default bundle exec rake -v "%s" --trace' % rake_task, user='deploy')
-        else:
-            util.rake(app, rake_task)
+        util.rake(app, rake_task)
 
 
 @task
