@@ -20,13 +20,19 @@ do
             break
             ;;
         "quit")
-            echo "Exiting..."
             exit 0
             ;;
         *) echo invalid option;;
     esac
 done
 
+echo "Querying all servers, this will take a while..."
 fab $environment all -P -z 10 puppet.config_version | grep -E "\[(.*)\] out: (.+)" | tr -d '[]' | awk -F ' out: ' ' { print $1 "," $2; }' > out.csv
+
+echo "Processing server results..."
 python bin/show_puppet_versions.py $environment out.csv
+
+echo "Removing remporary file..."
 rm out.csv
+
+echo "Done!"
