@@ -52,7 +52,9 @@ def enhance_with_release_number(server_mapping):
     Because many of the SHAs will be the same, there is caching in place to
     avoid unnecessary calls.
     """
-    access_token = os.environ['GITHUB_ACCESS_TOKEN']
+    access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+    if access_token is None:
+        raise ValueError("Please set GITHUB_ACCESS_TOKEN in order to continue")
 
     for server_name, puppet_information in server_mapping.iteritems():
         sha = puppet_information.get('sha')
