@@ -58,3 +58,10 @@ def sign_certificates():
         with settings(hide('running'), ok_ret_codes=[0, 24]):
             sudo('puppet cert sign --all')
         sleep(10)
+
+
+@task
+def config_version():
+    """Fetch the current puppet config version"""
+    sudo("awk '/config:/ { print \"sha:\" $2 }' /var/lib/puppet/state/last_run_summary.yaml | tr -d '\"'")
+    sudo("awk '/last_run:/ { print \"time:\" $2 }' /var/lib/puppet/state/last_run_summary.yaml | tr -d '\"'")
