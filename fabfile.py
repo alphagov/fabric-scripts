@@ -37,7 +37,6 @@ import performanceplatform
 import postgresql
 import rabbitmq
 import rkhunter
-import search
 import statsd
 import topic_change
 import vm
