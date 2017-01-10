@@ -37,7 +37,6 @@ import postgresql
 import rabbitmq
 import rkhunter
 import statsd
-import topic_change
 import vm
 import whitehall
 
