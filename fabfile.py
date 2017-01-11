@@ -27,7 +27,6 @@ import incident
 import locksmith
 import logstream
 import mongo
-import mainstream_slugs
 import mapit
 import mysql
 import nagios
@@ -38,7 +37,6 @@ import postgresql
 import rabbitmq
 import rkhunter
 import statsd
-import topic_change
 import vm
 import whitehall
 
