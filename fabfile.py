@@ -36,6 +36,7 @@ import ntp
 import performanceplatform
 import postgresql
 import rabbitmq
+import rbenv
 import rkhunter
 import search
 import statsd
