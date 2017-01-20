@@ -4,9 +4,21 @@
 and systems administration tasks. It allows the user to run commands across a
 server farm.
 
-## Local usage
+## Local usage and environment setup
 
-This is intended to be setup and run on your local workstation/laptop.
+The tool is intended to be configured and run on your local workstation/laptop. You should use `virtualenv` to create an isolated Python environment.
+
+To install `pip`, `virualenv` and set up the environment:
+
+    $ sudo easy_install pip
+    $ sudo pip install virtualenv
+    $ mkdir ~/venv
+    $ virtualenv ~/venv/fabric-scripts
+
+To enable the virtual environment for this session (you will need to do this for each new terminal window):
+
+    $ . ~/venv/fabric-scripts/bin/activate
+
 
 ### Setup
 
@@ -42,22 +54,22 @@ And execute against an environment and set of hosts like so:
 
 Fabric tasks can be run on groups of machines in a variety of different ways.
 
-by puppet class
+By puppet class:
 
     # target all machines that have the 'govuk::safe_to_reboot::yes' class
     $ fab integration puppet_class:govuk::safe_to_reboot::yes do:'uname -a'
 
-by numeric machine suffix
+By numeric machine suffix:
 
     # target all machines that end in '2'
     $ fab integration numbered:2 do:'uname -a'
 
-by node type (as defined in puppet)
+By node type (as defined in puppet):
 
     # target all 'frontend' machines
     $ fab integration node_type:frontend do:'uname -a'
 
-by the node name
+By the node name:
 
     # target just one node
     $ fab production -H backend-3.backend do:'uname -a'
@@ -77,12 +89,11 @@ and ensure that you do not have the following option anywhere in your
 
 ## Syncing postgres machines
 
-An example
+An example:
 
 `fab <env> -H '<src_db>' postgresql.sync:<db_name>,<dst_db> -A`
 
 the -A must be specified to forward the agent
 
 This will sync the specified database `<db_name>` from the machine with the
-hostname of `<src_db>` to the machine with hostaname `<dst_db>`. It will destroy
-data on the destination db
+hostname of `<src_db>` to the machine with hostaname `<dst_db>`. It will destroy data on the destination db.
