@@ -8,7 +8,7 @@ server farm.
 
 The tool is intended to be configured and run on your local workstation/laptop. You should use `virtualenv` to create an isolated Python environment.
 
-To install `pip`, `virualenv` and set up the environment:
+To install `pip`, `virtualenv` and set up the environment:
 
     $ sudo easy_install pip
     $ sudo pip install virtualenv
