@@ -1,7 +1,6 @@
 from fabric.api import run, task
 from fabric.utils import error
 import fabric.contrib.files
-import util
 
 etcd_cluster = 'http://etcd-1.management:4001'
 locksmithctl = '/usr/bin/locksmithctl'
@@ -15,7 +14,6 @@ def check_locksmithctl():
 @task
 def status():
     """Get the status of locksmith"""
-    util.use_random_host('class-etcd')
     check_locksmithctl()
     run("{0} -endpoint='{1}' status".format(locksmithctl, etcd_cluster))
 
@@ -23,6 +21,5 @@ def status():
 @task
 def unlock(machine_name):
     """Unlock a machine with locksmith"""
-    util.use_random_host('class-etcd')
     check_locksmithctl()
     run("{0} -endpoint='{1}' unlock '{2}'".format(locksmithctl, etcd_cluster, machine_name))
