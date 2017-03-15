@@ -2,7 +2,7 @@ from fabric.api import run, task
 from fabric.utils import error
 import fabric.contrib.files
 
-etcd_cluster = 'http://etcd-1.management:4001'
+etcd_cluster = 'http://etcd.cluster:2379'
 locksmithctl = '/usr/bin/locksmithctl'
 
 
