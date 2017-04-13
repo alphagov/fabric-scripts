@@ -1,6 +1,6 @@
 import StringIO
 
-from fabric.api import env, put, roles, runs_once, sudo, task
+from fabric.api import env, put, roles, runs_once, settings, sudo, task
 from fabric.operations import prompt
 from fabric.tasks import execute
 
@@ -14,6 +14,12 @@ env['eagerly_disconnect'] = True
 
 APPLICATIONS = ['static', 'frontend']
 CAMPAIGN_CLASSES = ['red', 'black', 'green']
+TEMPLATES = [
+    'wrapper.html.erb',
+    'homepage.html.erb',
+    'header_footer_only.html.erb',
+    'core_layout.html.erb',
+]
 
 
 def validate_classes(campaign_class):
@@ -70,8 +76,13 @@ def clear_static_generated_templates():
     This function clears the public/template directory to force it to
     be regenerated to include the emergency campaign.
     """
-    for template in ('wrapper.html.erb', 'header_footer_only.html.erb', 'core_layout.html.erb'):
-        sudo('rm /var/apps/static/public/templates/{}'.format(template))
+    for template in TEMPLATES:
+        with settings(warn_only=True):
+            sudo('rm /var/apps/static/public/templates/{}'.format(template))
+
+
+def clear_frontend_cache():
+    sudo("rm -rf /var/apps/frontend/tmp/cache/*")
 
 
 def deploy_banner(application):
@@ -117,3 +128,13 @@ def remove_emergency_banner():
     """Remove all banners from GOV.UK"""
     for application in APPLICATIONS:
         remove_banner(application)
+
+
+@task
+@roles('class-frontend')
+def clear_cached_templates():
+    for application in APPLICATIONS:
+        if application == 'frontend':
+            clear_frontend_cache()
+        if application == 'static':
+            clear_static_generated_templates()
