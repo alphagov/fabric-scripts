@@ -20,6 +20,7 @@ import puppet
 # Our command submodules
 import app
 import apt
+import bundler
 import cache
 import campaigns
 import cdn
