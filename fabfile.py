@@ -9,6 +9,7 @@ import textwrap
 import time
 
 from fabric import state
+from fabric.main import show_commands
 from fabric.api import (abort, env, get, hide, hosts, local, puts, run,
                         runs_once, serial, settings, sudo, task, warn)
 from fabric.task_utils import crawl
@@ -19,6 +20,7 @@ import puppet
 # Our command submodules
 import app
 import apt
+import bundler
 import cache
 import campaigns
 import cdn
@@ -244,8 +246,11 @@ def _replace_environment_hostnames(environment):
 
 
 @task
-def help(name):
+def help(name=""):
     """Show extended help for a task (e.g. 'fab help:search.reindex')"""
+    if not name:
+        puts("\nFor more information on a task run `fab help:<task>`.\n")
+        show_commands(None, 'short')
     task = crawl(name, state.commands)
 
     if task is None:
