@@ -41,6 +41,7 @@ import rbenv
 import rkhunter
 import statsd
 import vm
+import vpn
 import whitehall
 
 HERE = os.path.dirname(__file__)
