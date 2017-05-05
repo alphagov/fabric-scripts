@@ -85,6 +85,10 @@ def clear_frontend_cache():
     sudo("rm -rf /var/apps/frontend/tmp/cache/*")
 
 
+def clear_government_frontend_cache():
+    sudo("rm -rf /var/apps/government-frontend/tmp/cache/*")
+
+
 def deploy_banner(application):
     execute(template, application)
     if application == 'frontend':
@@ -133,8 +137,6 @@ def remove_emergency_banner():
 @task
 @roles('class-frontend')
 def clear_cached_templates():
-    for application in APPLICATIONS:
-        if application == 'frontend':
-            clear_frontend_cache()
-        if application == 'static':
-            clear_static_generated_templates()
+    clear_frontend_cache()
+    clear_static_generated_templates()
+    clear_government_frontend_cache()
