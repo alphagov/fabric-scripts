@@ -25,10 +25,11 @@ import campaigns
 import cdn
 import elasticsearch
 import incident
+import jenkins
 import locksmith
 import logstream
-import mongo
 import mapit
+import mongo
 import mysql
 import nagios
 import nginx
