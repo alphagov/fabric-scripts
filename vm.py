@@ -62,7 +62,7 @@ def bodge_unicorn(name):
     """
     Manually kill off (and restart) unicorn processes by name
 
-    e.g. vm.bodge_unicorn:contentapi
+    e.g. vm.bodge_unicorn:content-tagger
 
     Yes. This is a bodge. Sorry.
     """
