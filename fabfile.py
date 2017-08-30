@@ -96,7 +96,6 @@ class RoleFetcher(object):
             return
 
         self.hosts = _fetch_hosts()
-        self.roledefs['disaster_recovery'] = _fetch_hosts('--dr-only')
 
         for host in self.hosts:
             try:
@@ -127,6 +126,14 @@ class RoleFetcher(object):
 
         hosts = _fetch_hosts('-C %s' % name)
         self.roledefs['puppet_class-%s' % name] = hosts
+
+    def fetch_node_class(self, name):
+        # This is specifically for AWS as we fetch node classes using tags
+        if self.roledefs['puppet_class-%s' % name]:
+            return
+
+        hosts = _fetch_hosts('-c %s' % name)
+        self.roledefs['class-%s' % name] = hosts
 
     def __contains__(self, key):
         return True
@@ -262,7 +269,10 @@ def help(name=""):
 
 
 @task
-def production():
+def production(stackname = None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select production environment"""
     env['environment'] = 'production'
     _set_gateway('publishing.service.gov.uk')
@@ -270,7 +280,10 @@ def production():
 
 
 @task
-def staging():
+def staging(stackname = None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select staging environment"""
     env['environment'] = 'staging'
     _set_gateway('staging.publishing.service.gov.uk')
@@ -278,11 +291,14 @@ def staging():
 
 
 @task
-def integration():
+def integration(stackname = None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select integration environment"""
     env['environment'] = 'integration'
-    _set_gateway('integration.publishing.service.gov.uk')
-    _replace_environment_hostnames('integration')
+    _set_gateway("{}.integration.govuk.digital".format(stackname))
+    _replace_environment_hostnames("{}.integration".format(stackname))
 
 
 @task
@@ -306,6 +322,9 @@ def klass(*class_names):
     """Select a machine class"""
     for class_name in class_names:
         class_name = class_name.replace("-", "_")
+
+        env.roledefs.fetch_node_class(class_name)
+
         env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 
@@ -339,12 +358,6 @@ def node_type(node_name):
 def vdc(vdc_name):
     """Select a virtual datacentre"""
     env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
-
-
-@task
-def disaster_recovery():
-    """Select disaster recovery machines"""
-    env.hosts.extend(env.roledefs['disaster_recovery']())
 
 
 @task
