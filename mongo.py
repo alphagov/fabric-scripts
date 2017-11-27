@@ -17,9 +17,9 @@ def node_health(health_code):
     return "OK" if health_code == 1 else "ERROR"
 
 
-def strip_dates(raw_output):
-    stripped_isodates = re.sub(r'ISODate\((.*?)\)', r'\1', raw_output)
-    return re.sub(r'Timestamp\((.*?)\)', r'"\1"', stripped_isodates)
+def strip_bson(raw_output):
+    stripped = re.sub(r'(ISODate|ObjectId|NumberLong)\((.*?)\)', r'\2', raw_output)
+    return re.sub(r'Timestamp\((.*?)\)', r'"\1"', stripped)
 
 
 def mongo_command(command):
@@ -30,7 +30,7 @@ def run_mongo_command(command):
     response = run(mongo_command('printjson(%s)' % command))
 
     try:
-        return json.loads(strip_dates(response))
+        return json.loads(strip_bson(response))
     except ValueError:
         print response
 
