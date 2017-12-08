@@ -1,7 +1,9 @@
 from fabric.api import env, execute, roles, run, runs_once, task
 from fabric.utils import abort
+from urlparse import urlparse
 
 import cache
+import requests
 
 
 @task
@@ -22,7 +24,27 @@ def fastly_purge(*args):
                   % path)
     for govuk_path in args:
         for hostname in hostnames_to_purge:
+            print "Purging {0}".format(govuk_path)
             run("curl -s -X PURGE {0}{1} | grep 'ok'".format(hostname, govuk_path.strip()))
+
+
+@task
+@runs_once
+def purge_all_document_attachments(arg):
+    "Purge each of the attachments for a specific document."
+    if env.environment == 'production':
+        hostname = 'https://www.gov.uk/api/content/'
+    elif env.environment == 'staging':
+        hostname = 'https://www-origin.staging.publishing.service.gov.uk/api/content/'
+
+    response = requests.get("{0}{1}".format(hostname, arg))
+    if response.status_code == 200:
+        try:
+            attachments = response.json()['details']['attachments']
+            attachment_urls = [urlparse(attachment['url']).path for attachment in attachments]
+            execute(fastly_purge, *attachment_urls)
+        except KeyError:
+            print "No attachments for {0}".format(arg)
 
 
 @task
