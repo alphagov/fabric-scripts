@@ -64,16 +64,14 @@ ABORT_MSG = textwrap.dedent("""
 
         all
         class:<classname>
-        vdc:<vdcname>
 
     For example:
 
         fab production class:cache do:uname
 
-    To find a list of available classes and VDCs, you can run
+    To find a list of available classes:
 
         fab production classes
-        fab production vdcs
     """)
 
 
@@ -81,14 +79,13 @@ class RoleFetcher(object):
     """
     RoleFetcher is a helper class, an instance of which can be bound to the
     Fabric env.roledefs setting. It allows lazy lookup of host names by machine
-    class and vDC.
+    class.
     """
 
     def __init__(self):
         self.hosts = None
         self.roledefs = defaultdict(list)
         self.classes = set()
-        self.vdcs = set()
         self.fetched = False
 
     def fetch(self):
@@ -98,23 +95,10 @@ class RoleFetcher(object):
         self.hosts = _fetch_hosts()
 
         for host in self.hosts:
-            try:
-                name, vdc, _ = host.split('.', 2)
-            except ValueError:
-                warn("discarding badly formatted hostname '{0}'".format(host))
-                continue
-
-            # Don't refer to foo.bar.production, as it's confusing when doing
-            # things in integration or staging. Refer to the machines
-            # exclusively by short name.
-            short_host = '{0}.{1}'.format(name, vdc)
-
-            cls = name.rstrip('-1234567890').replace('-', '_')
-            self.roledefs['all'].append(short_host)
-            self.roledefs['class-%s' % cls].append(short_host)
-            self.roledefs['vdc-%s' % vdc].append(short_host)
+            cls = host.rstrip('-1234567890').replace('-', '_')
+            self.roledefs['all'].append(host)
+            self.roledefs['class-%s' % cls].append(host)
             self.classes.add(cls)
-            self.vdcs.add(vdc)
 
         self.fetched = True
 
@@ -269,7 +253,7 @@ def help(name=""):
 
 
 @task
-def production(stackname = None):
+def production(stackname=None):
     if not stackname:
         stackname = 'blue'
 
@@ -280,7 +264,7 @@ def production(stackname = None):
 
 
 @task
-def staging(stackname = None):
+def staging(stackname=None):
     if not stackname:
         stackname = 'blue'
 
@@ -291,7 +275,7 @@ def staging(stackname = None):
 
 
 @task
-def integration(stackname = None):
+def integration(stackname=None):
     if not stackname:
         stackname = 'blue'
 
@@ -355,12 +339,6 @@ def node_type(node_name):
 
 
 @task
-def vdc(vdc_name):
-    """Select a virtual datacentre"""
-    env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
-
-
-@task
 @runs_once
 def hosts():
     """List selected hosts"""
@@ -375,15 +353,6 @@ def classes():
     """List available classes"""
     for name in sorted(env.roledefs.classes):
         hosts = env.roledefs['class-%s' % name]
-        print("%-30.30s %s" % (name, len(hosts())))
-
-
-@task
-@runs_once
-def vdcs():
-    """List available virtual datacentres"""
-    for name in sorted(env.roledefs.vdcs):
-        hosts = env.roledefs['vdc-%s' % name]
         print("%-30.30s %s" % (name, len(hosts())))
 
 
