@@ -43,8 +43,14 @@ def clear_government_frontend_cache():
     sudo("rm -rf /var/apps/government-frontend/tmp/cache/*")
 
 
+@roles('class-calculators_frontend')
+def clear_finder_frontend_cache():
+    sudo("rm -rf /var/apps/finder-frontend/tmp/cache/*")
+
+
 @task
 def clear_cached_templates():
     execute(clear_frontend_cache)
     execute(clear_static_generated_templates)
     execute(clear_government_frontend_cache)
+    execute(clear_finder_frontend_cache)
