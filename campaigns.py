@@ -1,4 +1,4 @@
-from fabric.api import env, roles, settings, sudo, task
+from fabric.api import env, roles, settings, sudo, task, execute
 
 
 env['eagerly_disconnect'] = True
@@ -12,6 +12,7 @@ TEMPLATES = [
 ]
 
 
+@roles('class-frontend')
 def clear_static_generated_templates():
     """
     Our various frontend applications use the wrapper.html.erb,
@@ -32,17 +33,18 @@ def clear_static_generated_templates():
             sudo('rm /var/apps/static/public/templates/{}'.format(template))
 
 
+@roles('class-frontend')
 def clear_frontend_cache():
     sudo("rm -rf /var/apps/frontend/tmp/cache/*")
 
 
+@roles('class-frontend')
 def clear_government_frontend_cache():
     sudo("rm -rf /var/apps/government-frontend/tmp/cache/*")
 
 
 @task
-@roles('class-frontend')
 def clear_cached_templates():
-    clear_frontend_cache()
-    clear_static_generated_templates()
-    clear_government_frontend_cache()
+    execute(clear_frontend_cache)
+    execute(clear_static_generated_templates)
+    execute(clear_government_frontend_cache)
