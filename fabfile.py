@@ -64,16 +64,14 @@ ABORT_MSG = textwrap.dedent("""
 
         all
         class:<classname>
-        vdc:<vdcname>
 
     For example:
 
         fab production class:cache do:uname
 
-    To find a list of available classes and VDCs, you can run
+    To find a list of available classes:
 
         fab production classes
-        fab production vdcs
     """)
 
 
@@ -81,14 +79,13 @@ class RoleFetcher(object):
     """
     RoleFetcher is a helper class, an instance of which can be bound to the
     Fabric env.roledefs setting. It allows lazy lookup of host names by machine
-    class and vDC.
+    class.
     """
 
     def __init__(self):
         self.hosts = None
         self.roledefs = defaultdict(list)
         self.classes = set()
-        self.vdcs = set()
         self.fetched = False
 
     def fetch(self):
@@ -96,26 +93,12 @@ class RoleFetcher(object):
             return
 
         self.hosts = _fetch_hosts()
-        self.roledefs['disaster_recovery'] = _fetch_hosts('--dr-only')
 
         for host in self.hosts:
-            try:
-                name, vdc, _ = host.split('.', 2)
-            except ValueError:
-                warn("discarding badly formatted hostname '{0}'".format(host))
-                continue
-
-            # Don't refer to foo.bar.production, as it's confusing when doing
-            # things in integration or staging. Refer to the machines
-            # exclusively by short name.
-            short_host = '{0}.{1}'.format(name, vdc)
-
-            cls = name.rstrip('-1234567890').replace('-', '_')
-            self.roledefs['all'].append(short_host)
-            self.roledefs['class-%s' % cls].append(short_host)
-            self.roledefs['vdc-%s' % vdc].append(short_host)
+            cls = host.rstrip('-1234567890').replace('-', '_')
+            self.roledefs['all'].append(host)
+            self.roledefs['class-%s' % cls].append(host)
             self.classes.add(cls)
-            self.vdcs.add(vdc)
 
         self.fetched = True
 
@@ -127,6 +110,14 @@ class RoleFetcher(object):
 
         hosts = _fetch_hosts('-C %s' % name)
         self.roledefs['puppet_class-%s' % name] = hosts
+
+    def fetch_node_class(self, name):
+        # This is specifically for AWS as we fetch node classes using tags
+        if self.roledefs['puppet_class-%s' % name]:
+            return
+
+        hosts = _fetch_hosts('-c %s' % name)
+        self.roledefs['class-%s' % name] = hosts
 
     def __contains__(self, key):
         return True
@@ -262,7 +253,10 @@ def help(name=""):
 
 
 @task
-def production():
+def production(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select production environment"""
     env['environment'] = 'production'
     _set_gateway('publishing.service.gov.uk')
@@ -270,7 +264,10 @@ def production():
 
 
 @task
-def staging():
+def staging(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select staging environment"""
     env['environment'] = 'staging'
     _set_gateway('staging.publishing.service.gov.uk')
@@ -278,11 +275,14 @@ def staging():
 
 
 @task
-def integration():
+def integration(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
     """Select integration environment"""
     env['environment'] = 'integration'
-    _set_gateway('integration.publishing.service.gov.uk')
-    _replace_environment_hostnames('integration')
+    _set_gateway("{}.integration.govuk.digital".format(stackname))
+    _replace_environment_hostnames("{}.integration".format(stackname))
 
 
 @task
@@ -306,6 +306,9 @@ def klass(*class_names):
     """Select a machine class"""
     for class_name in class_names:
         class_name = class_name.replace("-", "_")
+
+        env.roledefs.fetch_node_class(class_name)
+
         env.hosts.extend(env.roledefs['class-%s' % class_name]())
 
 
@@ -336,18 +339,6 @@ def node_type(node_name):
 
 
 @task
-def vdc(vdc_name):
-    """Select a virtual datacentre"""
-    env.hosts.extend(env.roledefs['vdc-%s' % vdc_name]())
-
-
-@task
-def disaster_recovery():
-    """Select disaster recovery machines"""
-    env.hosts.extend(env.roledefs['disaster_recovery']())
-
-
-@task
 @runs_once
 def hosts():
     """List selected hosts"""
@@ -362,15 +353,6 @@ def classes():
     """List available classes"""
     for name in sorted(env.roledefs.classes):
         hosts = env.roledefs['class-%s' % name]
-        print("%-30.30s %s" % (name, len(hosts())))
-
-
-@task
-@runs_once
-def vdcs():
-    """List available virtual datacentres"""
-    for name in sorted(env.roledefs.vdcs):
-        hosts = env.roledefs['vdc-%s' % name]
         print("%-30.30s %s" % (name, len(hosts())))
 
 
