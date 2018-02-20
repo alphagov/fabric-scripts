@@ -51,3 +51,33 @@ def respawn_large_unicorns(app):
         abort('App not running unicorn')
 
     sudo("kill -QUIT $(ps -o rss,pid --ppid %s --sort +rss | tail -n1 | awk '{print $2}')" % master_pid)
+
+
+def env_filename(app, name):
+    return '/etc/govuk/{app}/env.d/{name}'.format(app=app, name=name)
+
+
+@task
+def setenv(app, name, value):
+    """
+    Set an environment variable for an application.
+
+    Note: this does not restart the application or any relevant other services.
+    """
+
+    sudo('echo -n \'{value}\' > {filename}'.format(
+        value=value, filename=env_filename(app, name)
+    ))
+
+
+@task
+def rmenv(app, name):
+    """
+    Remove an environment variable for an application.
+
+    Note: this does not restart the application or any relevant other services.
+    """
+
+    sudo('rm {filename}'.format(
+        filename=env_filename(app, name)
+    ))
