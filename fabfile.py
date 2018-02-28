@@ -24,6 +24,7 @@ import cache
 import campaigns
 import cdn
 import elasticsearch
+import emailalertapi
 import incident
 import jenkins
 import locksmith
