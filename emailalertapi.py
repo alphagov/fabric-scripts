@@ -14,3 +14,10 @@ def deliver_test_email(address):
 def truncate_tables():
     """Truncates tables - ONLY USE ON INITIAL DEPLOY"""
     util.rake('email-alert-api', 'deploy:truncate_tables')
+
+
+@task
+@hosts('email-alert-api-1.backend')
+def table_counts():
+    """Returns a count of rows in each table in the email-alert-api database"""
+    util.rake('email-alert-api', 'deploy:count_tables')
