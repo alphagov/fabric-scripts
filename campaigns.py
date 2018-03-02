@@ -11,9 +11,9 @@ TEMPLATES = [
     'core_layout.html.erb',
 ]
 
-
 @roles('class-frontend')
-def clear_static_generated_templates():
+@task
+def clear_cached_templates():
     """
     Our various frontend applications use the wrapper.html.erb,
     header_footer_only.html.erb and core_layout.html.erb layout templates.
@@ -31,26 +31,3 @@ def clear_static_generated_templates():
     for template in TEMPLATES:
         with settings(warn_only=True):
             sudo('rm /var/apps/static/public/templates/{}'.format(template))
-
-
-@roles('class-frontend')
-def clear_frontend_cache():
-    sudo("rm -rf /var/apps/frontend/tmp/cache/*")
-
-
-@roles('class-frontend')
-def clear_government_frontend_cache():
-    sudo("rm -rf /var/apps/government-frontend/tmp/cache/*")
-
-
-@roles('class-calculators_frontend')
-def clear_finder_frontend_cache():
-    sudo("rm -rf /var/apps/finder-frontend/tmp/cache/*")
-
-
-@task
-def clear_cached_templates():
-    execute(clear_frontend_cache)
-    execute(clear_static_generated_templates)
-    execute(clear_government_frontend_cache)
-    execute(clear_finder_frontend_cache)
