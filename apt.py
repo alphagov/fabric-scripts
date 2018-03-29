@@ -48,3 +48,9 @@ def autoremove():
 def autoremove_dry_run():
     """Run `apt-get autoremove` dry run"""
     sudo('apt-get autoremove --dry-run')
+
+
+@task
+def update():
+    """Run `apt-get update`"""
+    sudo('apt-get update')
