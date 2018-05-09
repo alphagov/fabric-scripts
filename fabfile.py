@@ -273,6 +273,15 @@ def staging(stackname=None):
     _set_gateway('staging.publishing.service.gov.uk')
     _replace_environment_hostnames('staging')
 
+@task
+def aws_staging(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
+    """Select staging environment"""
+    env['environment'] = 'staging'
+    _set_gateway("{}.staging.govuk.digital".format(stackname))
+    _replace_environment_hostnames("{}.staging".format(stackname))    
 
 @task
 def integration(stackname=None):
