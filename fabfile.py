@@ -286,6 +286,17 @@ def integration(stackname=None):
 
 
 @task
+def aws_staging(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
+    """Select GOV.UK AWS Staging  environment"""
+    env['environment'] = 'staging'
+    _set_gateway("{}.staging.govuk.digital".format(stackname))
+    _replace_environment_hostnames("{}.staging".format(stackname))
+
+
+@task
 def all():
     """Select all machines in current environment"""
     env.hosts.extend(env.roledefs['all']())

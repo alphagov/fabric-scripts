@@ -61,6 +61,30 @@ def sign_certificates():
 
 
 @task
+def cert_clean():
+    """Remove old puppet certificates from all clients except for puppetmaster."""
+    print('Removing puppet client certificates in a loop. Cancel this command to stop removing certificates.')
+    """We have to accept error code 1[The file doesn't have puppet master] 2[no such file] 3[puppet is not running]"""
+    with settings(ok_ret_codes=[0, 1, 2, 3]):
+        if run("sudo cat /var/lib/puppet/state/classes.txt|grep master"):
+            print('I am a puppet master. Hence, we are skipping.')
+        else:
+            print('Stopping the puppet daemon.')
+            sudo("/etc/init.d/puppet stop")
+            print('Removing old certs.')
+            sudo('rm -rf /etc/puppet/ssl')
+            print('request a new cert')
+            sudo('puppet agent -t')
+
+
+@task
+def agent_run():
+    """This task will perform a puppet run while accepting exceptions for errors listed below."""
+    with settings(ok_ret_codes=[0, 1, 2, 4, 6]):
+        sudo('puppet agent -t')
+
+
+@task
 def config_version():
     """Fetch the current puppet config version"""
     sudo("awk '/config:/ { print \"sha:\" $2 }' /var/lib/puppet/state/last_run_summary.yaml | tr -d '\"'")
