@@ -2,7 +2,7 @@ from fabric.api import roles, run, sudo, task
 
 
 @task
-@roles('class-jenkins')
+@roles('jenkins')
 def engage_dr():
     """Failover openconnect to use the DR VPN and disable Puppet"""
     run('govuk_puppet --disable "Failed over to DR VPN"')

@@ -12,7 +12,7 @@ TEMPLATES = [
 ]
 
 
-@roles('class-frontend')
+@roles('frontend')
 def clear_static_generated_templates():
     """
     Our various frontend applications use the wrapper.html.erb,
@@ -33,17 +33,17 @@ def clear_static_generated_templates():
             sudo('rm /var/apps/static/public/templates/{}'.format(template))
 
 
-@roles('class-frontend')
+@roles('frontend')
 def clear_frontend_cache():
     sudo("rm -rf /var/apps/frontend/tmp/cache/*")
 
 
-@roles('class-frontend')
+@roles('frontend')
 def clear_government_frontend_cache():
     sudo("rm -rf /var/apps/government-frontend/tmp/cache/*")
 
 
-@roles('class-calculators_frontend')
+@roles('calculators_frontend')
 def clear_finder_frontend_cache():
     sudo("rm -rf /var/apps/finder-frontend/tmp/cache/*")
 
