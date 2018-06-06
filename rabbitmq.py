@@ -4,7 +4,7 @@ import re
 
 
 @task
-@roles('class-rabbitmq')
+@roles('rabbitmq')
 def status():
     """Output the RabbitMQ cluster status"""
     sudo('rabbitmqctl cluster_status', warn_only=True)
@@ -55,7 +55,7 @@ def cluster_is_ok():
 
 
 @task
-@roles('class-rabbitmq')
+@roles('rabbitmq')
 def safe_reboot():
     """Reboot rabbitmq machines, waiting for cluster to be healthy first"""
     import vm

@@ -2,7 +2,7 @@ from fabric.api import roles, run, sudo, task
 
 
 @task
-@roles('class-cache', 'class-draft_cache')
+@roles('cache', 'draft_cache')
 def purge(*args):
     "Purge items from varnish, eg \"/one,/two,/three\""
     for path in args:
@@ -10,7 +10,7 @@ def purge(*args):
 
 
 @task
-@roles('class-cache', 'class-draft_cache')
+@roles('cache', 'draft_cache')
 def ban_all():
     """
     Invalidate all current cached objects in varnish.
@@ -25,7 +25,7 @@ def ban_all():
 
 
 @task
-@roles('class-cache', 'class-draft_cache')
+@roles('cache', 'draft_cache')
 def restart():
     """
     Restart Varnish caches
@@ -34,7 +34,7 @@ def restart():
 
 
 @task(default=True)
-@roles('class-cache', 'class-draft_cache')
+@roles('cache', 'draft_cache')
 def stats():
     "Show details about varnish performance"
     sudo('varnishstat -1')

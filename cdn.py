@@ -6,7 +6,7 @@ import cache
 
 @task
 @runs_once
-@roles('class-cache')
+@roles('cache')
 def fastly_purge(*args):
     "Purge items from Fastly, eg \"/one,/two,/three\". Wildcards not supported."
     if env.environment == 'production':

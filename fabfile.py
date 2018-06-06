@@ -83,7 +83,7 @@ class RoleFetcher(object):
     """
 
     def __init__(self):
-        self.hosts = None
+        self.hosts = []
         self.roledefs = defaultdict(list)
         self.classes = set()
         self.fetched = False
@@ -91,15 +91,21 @@ class RoleFetcher(object):
     def fetch(self):
         if self.fetched:
             return
+        if not env['aws_migration']:
+                self.hosts = _fetch_hosts()
 
-        self.hosts = _fetch_hosts()
-
-        for host in self.hosts:
-            cls = host.rstrip('-1234567890').replace('-', '_')
-            self.roledefs['all'].append(host)
-            self.roledefs['class-%s' % cls].append(host)
-            self.classes.add(cls)
-
+                for host in self.hosts:
+                    cls = re.split('-[0-9]', host)[0].replace('-', '_')
+                    self.roledefs['all'].append(host)
+                    self.roledefs[cls].append(host)
+                    self.classes.add(cls)
+        else:
+                self.classes = _fetch_hosts('--classes')
+                for cls in self.classes:
+                        hsts = _fetch_hosts('-c %s' % cls)
+                        self.hosts = self.hosts + hsts
+                        self.roledefs['all'] += hsts
+                        self.roledefs[cls] += hsts
         self.fetched = True
 
     def fetch_puppet_class(self, name):
@@ -117,7 +123,7 @@ class RoleFetcher(object):
             return
 
         hosts = _fetch_hosts('-c %s' % name)
-        self.roledefs['class-%s' % name] = hosts
+        self.roledefs[name] = hosts
 
     def __contains__(self, key):
         return True
@@ -259,6 +265,7 @@ def production(stackname=None):
 
     """Select production environment"""
     env['environment'] = 'production'
+    env['aws_migration'] = False
     _set_gateway('publishing.service.gov.uk')
     _replace_environment_hostnames('production')
 
@@ -270,6 +277,7 @@ def staging(stackname=None):
 
     """Select staging environment"""
     env['environment'] = 'staging'
+    env['aws_migration'] = False
     _set_gateway('staging.publishing.service.gov.uk')
     _replace_environment_hostnames('staging')
 
@@ -281,6 +289,7 @@ def integration(stackname=None):
 
     """Select integration environment"""
     env['environment'] = 'integration'
+    env['aws_migration'] = True
     _set_gateway("{}.integration.govuk.digital".format(stackname))
     _replace_environment_hostnames("{}.integration".format(stackname))
 
@@ -292,6 +301,7 @@ def aws_staging(stackname=None):
 
     """Select GOV.UK AWS Staging  environment"""
     env['environment'] = 'staging'
+    env['aws_migration'] = True
     _set_gateway("{}.staging.govuk.digital".format(stackname))
     _replace_environment_hostnames("{}.staging".format(stackname))
 
@@ -320,7 +330,7 @@ def klass(*class_names):
 
         env.roledefs.fetch_node_class(class_name)
 
-        env.hosts.extend(env.roledefs['class-%s' % class_name]())
+        env.hosts.extend(env.roledefs[class_name]())
 
 
 @task
@@ -363,7 +373,7 @@ def hosts():
 def classes():
     """List available classes"""
     for name in sorted(env.roledefs.classes):
-        hosts = env.roledefs['class-%s' % name]
+        hosts = env.roledefs[name]
         print("%-30.30s %s" % (name, len(hosts())))
 
 
