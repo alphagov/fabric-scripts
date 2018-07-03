@@ -1,4 +1,4 @@
-from fabric.api import task, execute, runs_once, roles
+from fabric.api import task, execute, runs_once
 import util
 
 
@@ -14,7 +14,6 @@ def dedupe_stats_announcement_from_file(filename):
 
 @task
 @runs_once
-@roles('whitehall_backend')
 def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
     """De-duplicate Whitehall statistics announcement"""
     option = ' -n' if noop else ''
@@ -26,7 +25,6 @@ def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
 
 @task
 @runs_once
-@roles('whitehall_backend')
 def overdue_scheduled_publications():
     """List overdue scheduled publications"""
     util.rake('whitehall', 'publishing:overdue:list')
@@ -34,7 +32,6 @@ def overdue_scheduled_publications():
 
 @task
 @runs_once
-@roles('whitehall_backend')
 def schedule_publications():
     """Publish overdue scheduled publications"""
     util.rake('whitehall', 'publishing:overdue:publish')
@@ -42,7 +39,6 @@ def schedule_publications():
 
 @task
 @runs_once
-@roles('whitehall_backend')
 def unpublish_statistics_announcement(*slugs):
     """Unpublish statistics announcements and register 410 GONE routes"""
     for slug in slugs:
