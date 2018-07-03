@@ -21,7 +21,6 @@ import app
 import apt
 import bundler
 import cache
-import campaigns
 import cdn
 import elasticsearch
 import emailalertapi
@@ -41,7 +40,6 @@ import rabbitmq
 import rbenv
 import statsd
 import vm
-import vpn
 import whitehall
 
 HERE = os.path.dirname(__file__)
