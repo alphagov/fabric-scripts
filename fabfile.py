@@ -47,9 +47,6 @@ import whitehall
 HERE = os.path.dirname(__file__)
 SSH_DIR = os.path.join(HERE, '.ssh')
 
-# How old a local hosts file can be before we check for an update
-HOSTS_FILE_CACHE_TIME = 3600 * 24
-
 # When to warn that you haven't pulled the repo recently.
 REPO_OUTDATED_TIME = 3600 * 24 * 5
 REPO_OUTDATED_FILE = os.path.join(HERE, '.git/FETCH_HEAD')
@@ -68,56 +65,6 @@ def fetch_hosts(options=''):
             hosts = local(command).splitlines()
 
     return map(lambda host: host.split(".")[0], hosts)
-
-
-def _fetch_known_hosts():
-    """
-    Fetch the system known_hosts file for the selected gateway. This downloads
-    the remote gateway's system known_hosts file and installs it to where Fabric
-    will look for it.
-
-    If your host keys are out of date, you can simply blow away SSH_DIR and
-    rerun the command. Fabric should re-download the known_hosts file from the
-    gateway.
-    """
-    if env.gateway is None:
-        raise RuntimeError("Tried to _fetch_known_hosts with no env.gateway set!")
-
-    known_hosts_file = os.path.join(SSH_DIR, env.gateway)
-
-    remote_known_hosts_file = "/etc/ssh/ssh_known_hosts"
-
-    if _known_hosts_outdated(known_hosts_file, remote_known_hosts_file):
-        print("Updating local copy of %s hosts" % env.gateway)
-        with settings(host_string=env.gateway, gateway=None):
-            get('/etc/ssh/ssh_known_hosts', known_hosts_file)
-
-    return known_hosts_file
-
-
-def _known_hosts_outdated(local_filename, remote_filename):
-    """Check whether a local copy of a jumpbox hosts file is outdated.
-
-    We keep a local copy of known hosts from each jumpbox to use when we want
-    to run a command against a whole class of hosts (or indeed all of them). We
-    need to make sure this is kept reasonably current, so we run commands
-    against the right machines.
-
-    """
-    if not os.path.exists(local_filename):
-        return True
-
-    # Give the file a grace period, so we don't go checking every single time
-    if time.time() - os.path.getmtime(local_filename) < HOSTS_FILE_CACHE_TIME:
-        return False
-
-    # Compare local and remote checksums to see whether we need to update
-    local_checksum = md5(open(local_filename).read()).hexdigest()
-    with hide('running', 'stdout'):
-        with settings(host_string=env.gateway, gateway=None):
-            remote_checksum = run("md5sum %s" % remote_filename).split()[0]
-
-    return local_checksum != remote_checksum
 
 
 def _check_repo_age():
@@ -140,7 +87,6 @@ def _set_gateway(jumpbox_domain):
     then dynamically fetches a list of hosts from the gateway box.
     """
     env.gateway = 'jumpbox.{0}'.format(jumpbox_domain)
-    env.system_known_hosts = _fetch_known_hosts()
 
 
 @task
