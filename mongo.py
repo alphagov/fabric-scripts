@@ -1,4 +1,4 @@
-from fabric.api import task, roles, runs_once
+from fabric.api import task, runs_once
 from fabric.api import run, sudo, hide, settings, abort, execute, puts, env
 from fabric import colors
 from datetime import date
@@ -33,13 +33,6 @@ def run_mongo_command(command):
         return json.loads(strip_bson(response))
     except ValueError:
         print response
-
-
-@task(default=True)
-@roles('mongo')
-def replsetlogs(*args):
-    """Grep the mongod logs for replSet today"""
-    sudo('grep replSet /var/log/mongodb/mongod.log | grep "%s"' % today)
 
 
 @task
@@ -211,16 +204,3 @@ def safe_reboot():
         abort("Cluster has not recovered")
 
     execute(vm.reboot, hosts=[env['host_string']])
-
-
-@task
-def mount_licensify_encrypted_drive():
-    with settings(ok_ret_codes=[0, 1]):
-        result = run('grep /var/lib/mongodb /proc/mounts')
-        if result.return_code == 0:
-            exit('/var/lib/mongodb is already mounted on this host.')
-    with settings(warn_only=True):
-        sudo('service mongodb stop')
-    sudo('rm -rf /var/lib/mongodb/*')
-    sudo('mount /var/lib/mongodb')
-    sudo('service mongodb start')
