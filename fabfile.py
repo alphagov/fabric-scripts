@@ -54,105 +54,20 @@ HOSTS_FILE_CACHE_TIME = 3600 * 24
 REPO_OUTDATED_TIME = 3600 * 24 * 5
 REPO_OUTDATED_FILE = os.path.join(HERE, '.git/FETCH_HEAD')
 
-ABORT_MSG = textwrap.dedent("""
-    You must select an environment before running this task, e.g.
 
-        fab production [task, [task, [...]]]
+def fetch_hosts(options=''):
+    command = "govuk_node_list %s" % options
 
-    If you've called fabric with the -R flag, please instead use one of the
-    following tasks to select a set of machines:
-
-        all
-        class:<classname>
-
-    For example:
-
-        fab production class:cache do:uname
-
-    To find a list of available classes:
-
-        fab production classes
-    """)
-
-
-class RoleFetcher(object):
-    """
-    RoleFetcher is a helper class, an instance of which can be bound to the
-    Fabric env.roledefs setting. It allows lazy lookup of host names by machine
-    class.
-    """
-
-    def __init__(self):
-        self.hosts = []
-        self.roledefs = defaultdict(list)
-        self.classes = set()
-        self.fetched = False
-
-    def fetch(self):
-        if self.fetched:
-            return
-        if not env['aws_migration']:
-                self.hosts = _fetch_hosts()
-
-                for host in self.hosts:
-                    cls = re.split('-[0-9]', host)[0].replace('-', '_')
-                    self.roledefs['all'].append(host)
-                    self.roledefs[cls].append(host)
-                    self.classes.add(cls)
-        else:
-                self.classes = _fetch_hosts('--classes')
-                for cls in self.classes:
-                        hsts = _fetch_hosts('-c %s' % cls)
-                        self.hosts = self.hosts + hsts
-                        self.roledefs['all'] += hsts
-                        self.roledefs[cls] += hsts
-        self.fetched = True
-
-    def fetch_puppet_class(self, name):
-        # These cannot be prefetched because there's too many variations.
-        # But we only need to fetch once for each.
-        if self.roledefs['puppet_class-%s' % name]:
-            return
-
-        hosts = _fetch_hosts('-C %s' % name)
-        self.roledefs['puppet_class-%s' % name] = hosts
-
-    def fetch_node_class(self, name):
-        # This is specifically for AWS as we fetch node classes using tags
-        if self.roledefs['puppet_class-%s' % name]:
-            return
-
-        hosts = _fetch_hosts('-c %s' % name)
-        self.roledefs[name] = hosts
-
-    def __contains__(self, key):
-        return True
-
-    def __getitem__(self, key):
-        def _looker_upper():
-            self._assert_fetched()
-            return self.roledefs[key]
-        return _looker_upper
-
-    def _assert_fetched(self):
-        if not self.fetched:
-            abort(ABORT_MSG)
-
-
-def _fetch_hosts(extra_args=''):
-    """
-    Fetch a list of hosts in this environment, regardless of whether we're
-    executing from within the environment or via a gateway.
-    """
-    list_cmd = 'govuk_node_list %s' % extra_args
     with hide('running', 'stdout'):
         if env.gateway:
             with settings(host_string=env.gateway, gateway=None):
-                return run(list_cmd).splitlines()
+                hosts = run(command).splitlines()
 
         # Otherwise assume we're *in* the infrastructure
         else:
-            return local(list_cmd).splitlines()
+            hosts = local(command).splitlines()
+
+    return map(lambda host: host.split(".")[0], hosts)
 
 
 def _fetch_known_hosts():
@@ -226,21 +141,6 @@ def _set_gateway(jumpbox_domain):
     """
     env.gateway = 'jumpbox.{0}'.format(jumpbox_domain)
     env.system_known_hosts = _fetch_known_hosts()
-    env.roledefs.fetch()
-
-
-def _replace_environment_hostnames(environment):
-    """
-    Users regularly specify environment as the suffix of a hostname when
-    sshing into a machine, thus a very common mistake is that fab processes
-    specify the host name with the environment. This replaces the environment
-    part of the host name and warns the user
-    """
-    suffix = "." + environment
-    for key, host in enumerate(env.hosts):
-        if host.endswith(suffix):
-            warn("host %s contains the environment which will automatically be removed" % host)
-            env.hosts[key] = host[:-len(suffix)]
 
 
 @task
@@ -267,7 +167,6 @@ def production(stackname=None):
     env['environment'] = 'production'
     env['aws_migration'] = False
     _set_gateway('publishing.service.gov.uk')
-    _replace_environment_hostnames('production')
 
 
 @task
@@ -279,7 +178,6 @@ def staging(stackname=None):
     env['environment'] = 'staging'
     env['aws_migration'] = False
     _set_gateway('staging.publishing.service.gov.uk')
-    _replace_environment_hostnames('staging')
 
 
 @task
@@ -291,7 +189,6 @@ def integration(stackname=None):
     env['environment'] = 'integration'
     env['aws_migration'] = True
     _set_gateway("{}.integration.govuk.digital".format(stackname))
-    _replace_environment_hostnames("{}.integration".format(stackname))
 
 
 @task
@@ -303,23 +200,12 @@ def aws_staging(stackname=None):
     env['environment'] = 'staging'
     env['aws_migration'] = True
     _set_gateway("{}.staging.govuk.digital".format(stackname))
-    _replace_environment_hostnames("{}.staging".format(stackname))
 
 
 @task
 def all():
     """Select all machines in current environment"""
-    env.hosts.extend(env.roledefs['all']())
-
-
-@task(alias='num')
-@runs_once
-@serial
-def numbered(number):
-    """Select only machines with a given number"""
-    if (not re.match(r'\A[0-9]+\Z', number)):
-        abort("Unrecognised number: %s" % number)
-    env.hosts = [host for host in env.hosts if re.search((r'-%s\.' % number), host)]
+    env.hosts.extend(fetch_hosts())
 
 
 @task(name='class')
@@ -327,10 +213,7 @@ def klass(*class_names):
     """Select a machine class"""
     for class_name in class_names:
         class_name = class_name.replace("-", "_")
-
-        env.roledefs.fetch_node_class(class_name)
-
-        env.hosts.extend(env.roledefs[class_name]())
+        env.hosts.extend(fetch_hosts("-c %s" % class_name))
 
 
 @task
@@ -339,8 +222,7 @@ def klass(*class_names):
 def puppet_class(*class_names):
     """Select all machines which include a given puppet class"""
     for class_name in class_names:
-        env.roledefs.fetch_puppet_class(class_name)
-        env.hosts.extend(env.roledefs['puppet_class-%s' % class_name]())
+        env.hosts.extend(fetch_hosts("-C %s" % class_name))
 
 
 @task
@@ -352,11 +234,27 @@ def application(app_name):
 
 
 @task
-@hosts('localhost')
 def node_type(node_name):
     """Select all machines of a given node type"""
     class_name = 'govuk::node::s_{}'.format(node_name.replace('-', '_'))
     puppet_class(class_name)
+
+
+@task
+@runs_once
+@hosts(["localhost"])
+def classes():
+    """List available classes"""
+    with hide("everything"):
+        if not env["aws_migration"]:
+            classes = set()
+
+            for host in fetch_hosts():
+                classes.add(re.split('-[0-9]', host)[0].replace('-', '_'))
+
+            print("\n".join(classes))
+        else:
+            print(run("govuk_node_list --classes"))
 
 
 @task
@@ -366,15 +264,6 @@ def hosts():
     me = state.commands['hosts']
     hosts = me.get_hosts(None, None, None, env)
     print('\n'.join(sorted(hosts)))
-
-
-@task
-@runs_once
-def classes():
-    """List available classes"""
-    for name in sorted(env.roledefs.classes):
-        hosts = env.roledefs[name]
-        print("%-30.30s %s" % (name, len(hosts())))
 
 
 @task
@@ -388,5 +277,4 @@ def sdo(command):
     """Execute arbitrary commands with sudo"""
     sudo(command)
 
-env.roledefs = RoleFetcher()
 _check_repo_age()
