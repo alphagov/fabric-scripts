@@ -1,10 +1,9 @@
-from fabric.api import env, execute, hide, roles, sudo, task
+from fabric.api import env, execute, hide, sudo, task
 from time import sleep
 import re
 
 
 @task
-@roles('rabbitmq')
 def status():
     """Output the RabbitMQ cluster status"""
     sudo('rabbitmqctl cluster_status', warn_only=True)
@@ -55,7 +54,6 @@ def cluster_is_ok():
 
 
 @task
-@roles('rabbitmq')
 def safe_reboot():
     """Reboot rabbitmq machines, waiting for cluster to be healthy first"""
     import vm

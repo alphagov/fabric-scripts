@@ -1,4 +1,4 @@
-from fabric.api import env, execute, roles, run, runs_once, task
+from fabric.api import env, execute, run, runs_once, task
 from fabric.utils import abort
 
 import cache
@@ -6,7 +6,6 @@ import cache
 
 @task
 @runs_once
-@roles('cache')
 def fastly_purge(*args):
     "Purge items from Fastly, eg \"/one,/two,/three\". Wildcards not supported."
     if env.environment == 'production':

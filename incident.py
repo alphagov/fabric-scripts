@@ -1,11 +1,10 @@
-from fabric.api import roles, task
+from fabric.api import task
 from fabric.tasks import execute
 import nginx
 import puppet
 
 
 @task
-@roles('cache')
 def fail_to_mirror():
     """Fails the site to the mirror by stopping nginx on the cache nodes"""
     puppet.disable("Fabric fail_to_mirror task invoked")
@@ -15,7 +14,6 @@ def fail_to_mirror():
 
 
 @task
-@roles('cache')
 def recover_origin():
     """Recovers GOV.UK to serve from origin after incident.fail_to_mirror has been invoked"""
     puppet.enable()
