@@ -1,7 +1,5 @@
-from fabric.api import env, execute, run, runs_once, task
+from fabric.api import env, run, runs_once, task
 from fabric.utils import abort
-
-import cache
 
 
 @task
@@ -22,10 +20,3 @@ def fastly_purge(*args):
     for govuk_path in args:
         for hostname in hostnames_to_purge:
             run("curl -s -X PURGE {0}{1} | grep 'ok'".format(hostname, govuk_path.strip()))
-
-
-@task
-def purge_all(*args):
-    "Purge items from Fastly and cache machines, eg \"/one,/two,/three\""
-    execute(cache.purge, *args)
-    execute(fastly_purge, *args)

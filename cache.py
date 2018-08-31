@@ -1,11 +1,4 @@
-from fabric.api import run, sudo, task
-
-
-@task
-def purge(*args):
-    "Purge items from varnish, eg \"/one,/two,/three\""
-    for path in args:
-        run("curl -s -I --fail -X PURGE http://localhost:7999%s" % path.strip())
+from fabric.api import sudo, task
 
 
 @task

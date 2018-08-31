@@ -50,7 +50,7 @@ And execute against an environment and set of hosts like so:
     $ fab integration class:cache,bouncer do:uptime
     ...
 
-### Targetting groups of machines
+### Targeting groups of machines
 
 Fabric tasks can be run on groups of machines in a variety of different ways.
 
