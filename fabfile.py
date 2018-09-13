@@ -23,7 +23,6 @@ import bundler
 import cache
 import cdn
 import elasticsearch
-import emailalertapi
 import incident
 import jenkins
 import locksmith
