@@ -22,7 +22,6 @@ import apt
 import bundler
 import cache
 import elasticsearch
-import emailalertapi
 import incident
 import jenkins
 import locksmith
