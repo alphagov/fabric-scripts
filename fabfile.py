@@ -145,6 +145,17 @@ def aws_staging(stackname=None):
 
 
 @task
+def aws_production(stackname=None):
+    if not stackname:
+        stackname = 'blue'
+
+    """Select GOV.UK AWS Production  environment"""
+    env['environment'] = 'production'
+    env['aws_migration'] = True
+    _set_gateway("{}.production.govuk.digital".format(stackname))
+
+
+@task
 def all():
     """Select all machines in current environment"""
     env.hosts.extend(fetch_hosts())
