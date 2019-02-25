@@ -25,12 +25,6 @@ def cluster_health():
 
 
 @task
-def cluster_nodes():
-    """Get cluster nodes"""
-    return run("curl -XGET 'http://localhost:9200/_cluster/nodes?pretty'")
-
-
-@task
 def check_recovery(index):
     """Check status of an index recovery"""
     return run("curl -XGET 'http://localhost:9200/{index}/_recovery'".format(index=index))
