@@ -1,9 +1,7 @@
 from distutils.version import StrictVersion
-from fabric.api import abort, env, execute, hide, run, runs_once, serial, settings, task
-from time import sleep
+from fabric.api import abort, hide, run, task
 import json
 import re
-import vm
 
 
 @task
@@ -73,68 +71,7 @@ def enable_reallocation():
         put_setting("cluster.routing.allocation.disable_allocation", "false")
 
 
-def wait_for_status(*allowed):
-    with settings(hide('output', 'running', 'warnings'), abort_on_prompts=True):
-        while True:
-            try:
-                output = cluster_health()
-                health = json.loads(output)
-            except (ValueError, SystemExit):
-                # Catching SystemExit is horrible but abort_on_prompts
-                # raises a SystemExit, this may change in fabric 2
-                # https://github.com/fabric/fabric/issues/762
-                status = "INVALID RESPONSE"
-            else:
-                status = health['status']
-                if (status in allowed):
-                    print("Cluster health is %s, matches %s" % (status, allowed))
-                    return
-            print("Cluster health is %s, waiting for %s" % (status, allowed))
-            sleep(5)
-
-
 @task
 def check_recovery(index):
     """Check status of an index recovery"""
     return run("curl -XGET 'http://localhost:9200/{index}/_recovery'".format(index=index))
-
-
-@task
-@serial
-def safe_reboot():
-    """Reboot only if the cluster is currently green"""
-    import vm
-    if not vm.reboot_required():
-        print("No reboot required")
-        return
-
-    wait_for_status("green")
-    disable_reallocation()
-
-    try:
-        execute(vm.reboot, hosts=[env['host_string']])
-
-        # Give the reboot time to start, before we check for the status again.
-        sleep(10)
-
-        # Status won't usually go back to green while reallocation is turned
-        # off, but should go to yellow.
-        wait_for_status("green", "yellow")
-        enable_reallocation()
-    except:
-        print(
-            "Failed to re-enable allocation - "
-            "you will need to enable it again using the "
-            "'elasticsearch.enable_reallocation' fabric command"
-        )
-        raise
-
-
-@task
-@serial
-@runs_once
-def redis_safe_reboot():
-    """Reboot only if no logs in queue"""
-    log_length = run('redis-cli llen logs')
-    if log_length == '(integer) 0':
-        execute(vm.reboot, hosts=[env['host_string']])
