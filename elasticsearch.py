@@ -1,6 +1,4 @@
-from distutils.version import StrictVersion
-from fabric.api import abort, hide, run, task
-import json
+from fabric.api import abort, run, task
 import re
 
 
@@ -30,45 +28,6 @@ def cluster_health():
 def cluster_nodes():
     """Get cluster nodes"""
     return run("curl -XGET 'http://localhost:9200/_cluster/nodes?pretty'")
-
-
-def version():
-    with hide('stdout'):
-        elasticsearch_info = run("curl http://localhost:9200")
-    version = json.loads(elasticsearch_info)['version']['number']
-    return version
-
-
-def put_setting(setting, value):
-    result = run("""curl -XPUT 'http://localhost:9200/_cluster/settings' -d '{
-        "transient": {"%s": "%s"}
-    }'""" % (setting, value))
-    parsed_result = json.loads(result)
-    if not parsed_result.get("acknowledged"):
-        raise RuntimeError("Failed to put setting: %s".format(result))
-    if StrictVersion(version()) < StrictVersion('1.0'):
-        if not parsed_result.get("ok"):
-            raise RuntimeError("Failed to put setting: %s".format(result))
-
-
-@task
-def disable_reallocation():
-    # Note - disable_allocation is deprecated in elasticsearch 1.0+, see
-    # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
-    if StrictVersion(version()) > StrictVersion('1.0'):
-        put_setting("cluster.routing.allocation.enable", "none")
-    else:
-        put_setting("cluster.routing.allocation.disable_allocation", "true")
-
-
-@task
-def enable_reallocation():
-    # Note - disable_allocation is deprecated in elasticsearch 1.0+, see
-    # http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html
-    if StrictVersion(version()) > StrictVersion('1.0'):
-        put_setting("cluster.routing.allocation.enable", "all")
-    else:
-        put_setting("cluster.routing.allocation.disable_allocation", "false")
 
 
 @task
