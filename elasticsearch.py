@@ -14,27 +14,27 @@ def query_elasticsearch(path, method='GET', host=ELASTICSEARCH_HOST, *args, **kw
 
 
 @task
-def delete(index):
+def delete(index, host=ELASTICSEARCH_HOST):
     """Delete an index"""
     if re.match('^[^/]+$', index):
-        query_elasticsearch(index, method='DELETE')
+        query_elasticsearch(index, method='DELETE', host=host)
     else:
         abort("Invalid index provided '%s'" % index)
 
 
 @task
-def status(index):
+def status(index, host=ELASTICSEARCH_HOST):
     """Get the status of an index"""
-    query_elasticsearch(index + '/_status')
+    query_elasticsearch(index + '/_status', host=host)
 
 
 @task
-def cluster_health():
+def cluster_health(host=ELASTICSEARCH_HOST):
     """Get cluster status"""
-    return query_elasticsearch('/_cluster/health?pretty', warn_only=True)
+    return query_elasticsearch('/_cluster/health?pretty', host=host, warn_only=True)
 
 
 @task
-def check_recovery(index):
+def check_recovery(index, host=ELASTICSEARCH_HOST):
     """Check status of an index recovery"""
-    return query_elasticsearch(index + '/_recovery')
+    return query_elasticsearch(index + '/_recovery', host=host)
