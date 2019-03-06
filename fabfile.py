@@ -21,6 +21,7 @@ import app
 import apt
 import bundler
 import cache
+import ckan
 import elasticsearch
 import incident
 import jenkins
