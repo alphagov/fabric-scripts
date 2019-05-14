@@ -34,7 +34,7 @@ NB: if you get a "pip: command not found" error, run this first:
 
 Configure it (see [the fabric documentation][fabdoc] for more examples),
 
-    $ echo 'user = jimbob' >> ~/.fabricrc
+    $ echo 'user = your_username' >> ~/.fabricrc
 
 [fabdoc]: http://docs.fabfile.org/en/latest/usage/fab.html
 
