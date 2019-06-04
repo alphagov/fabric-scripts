@@ -77,15 +77,6 @@ def _check_repo_age():
             warn('Your fabric-scripts may be out-of-date. Please `git pull` the repo')
 
 
-def _set_gateway(jumpbox_domain):
-    """
-    Set the remote gateway box by environment name. Sets the Fabric env.gateway
-    setting and makes sure that the correct known_hosts file will be consulted,
-    then dynamically fetches a list of hosts from the gateway box.
-    """
-    env.gateway = 'jumpbox.{0}'.format(jumpbox_domain)
-
-
 @task
 def help(name=""):
     """Show extended help for a task (e.g. 'fab help:search.reindex')"""
@@ -102,36 +93,27 @@ def help(name=""):
 
 
 @task
-def production(stackname=None):
-    if not stackname:
-        stackname = 'blue'
-
+def production():
     """Select production environment"""
     env['environment'] = 'production'
     env['aws_migration'] = False
-    _set_gateway('publishing.service.gov.uk')
+    env.gateway = 'jumpbox.publishing.service.gov.uk'
 
 
 @task
-def staging(stackname=None):
-    if not stackname:
-        stackname = 'blue'
-
+def staging():
     """Select staging environment"""
     env['environment'] = 'staging'
     env['aws_migration'] = False
-    _set_gateway('staging.publishing.service.gov.uk')
+    env.gateway = 'jumpbox.staging.publishing.service.gov.uk'
 
 
 @task
-def integration(stackname=None):
-    if not stackname:
-        stackname = 'blue'
-
+def integration():
     """Select integration environment"""
     env['environment'] = 'integration'
     env['aws_migration'] = True
-    _set_gateway("{}.integration.govuk.digital".format(stackname))
+    env.gateway = 'jumpbox.blue.integration.govuk.digital'
 
 
 @task
@@ -142,7 +124,7 @@ def aws_staging(stackname=None):
     """Select GOV.UK AWS Staging  environment"""
     env['environment'] = 'staging'
     env['aws_migration'] = True
-    _set_gateway("{}.staging.govuk.digital".format(stackname))
+    env.gateway = 'jumpbox.blue.staging.govuk.digital'
 
 
 @task
@@ -153,7 +135,15 @@ def aws_production(stackname=None):
     """Select GOV.UK AWS Production  environment"""
     env['environment'] = 'production'
     env['aws_migration'] = True
-    _set_gateway("{}.production.govuk.digital".format(stackname))
+    env.gateway = 'jumpbox.blue.production.govuk.digital'
+
+
+@task
+def ci():
+    """Select CI environment"""
+    env['environment'] = 'ci'
+    env['aws_migration'] = False
+    env.gateway = 'ci-jumpbox.integration.publishing.service.gov.uk'
 
 
 @task
