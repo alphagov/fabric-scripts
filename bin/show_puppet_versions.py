@@ -71,7 +71,7 @@ def validate_environment(environment):
     """
     Given an environment, makes sure it is valid.
     """
-    valid_environments = ['integration', 'staging', 'production']
+    valid_environments = ['training', 'integration', 'staging', 'production']
 
     if environment not in valid_environments:
         error = "Invalid environment '{}'. It should be one of: {}".format(

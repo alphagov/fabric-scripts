@@ -3,10 +3,14 @@
 set -e
 
 PS3='Please enter your choice: '
-options=("integration" "staging" "production" "quit")
+options=("training" "integration" "staging" "production" "quit")
 select opt in "${options[@]}"
 do
     case $opt in
+        "training")
+            environment="training"
+            break
+            ;;
         "integration")
             environment="integration"
             break
