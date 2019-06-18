@@ -117,6 +117,14 @@ def integration():
 
 
 @task
+def training():
+    """Select training environment"""
+    env['environment'] = 'training'
+    env['aws_migration'] = True
+    env.gateway = 'jumpbox.training.govuk.digital'
+
+
+@task
 def aws_staging(stackname=None):
     if not stackname:
         stackname = 'blue'
