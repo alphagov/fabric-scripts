@@ -3,8 +3,8 @@ cffi==1.11.5
 enum34==1.1.6
 Fabric==1.8.3
 GitPython==1.0.1
-paramiko==2.1.2
+paramiko==2.1.6
 pycrypto==2.6
 wsgiref==0.1.2
-jinja2==2.7.1
-requests==2.2.1
+jinja2==2.10.1
+requests==2.20.0
