@@ -23,6 +23,7 @@ import bundler
 import cache
 import ckan
 import elasticsearch
+import filebeat
 import incident
 import jenkins
 import locksmith
