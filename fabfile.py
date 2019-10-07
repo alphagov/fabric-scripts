@@ -137,6 +137,11 @@ def aws_staging(stackname=None):
 
 
 @task
+def staging_aws(stackname=None):
+    return aws_staging(stackname)
+
+
+@task
 def aws_production(stackname=None):
     if not stackname:
         stackname = 'blue'
@@ -145,6 +150,11 @@ def aws_production(stackname=None):
     env['environment'] = 'production'
     env['aws_migration'] = True
     env.gateway = 'jumpbox.blue.production.govuk.digital'
+
+
+@task
+def production_aws(stackname=None):
+    return aws_production(stackname)
 
 
 @task
