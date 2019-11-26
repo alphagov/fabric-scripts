@@ -1,7 +1,7 @@
 from fabric.api import abort, run, task
 import re
 
-ELASTICSEARCH_HOST = 'http://elasticsearch5:80'
+ELASTICSEARCH_HOST = 'http://elasticsearch6:80'
 
 
 def query_elasticsearch(path, method='GET', host=ELASTICSEARCH_HOST, *args, **kwargs):
