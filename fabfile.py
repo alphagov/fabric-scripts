@@ -34,7 +34,6 @@ import mysql
 import nagios
 import nginx
 import ntp
-import performanceplatform
 import postgresql
 import rabbitmq
 import rbenv
