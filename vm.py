@@ -131,7 +131,7 @@ def host_key(hostname):
         ssh_key = run("grep {0} /etc/ssh/ssh_known_hosts | head -1".format(hostname))
 
     if ssh_key == '':
-        print 'Machine {0} not found in ssh_known_hosts file'.format(hostname)
+        print('Machine {0} not found in ssh_known_hosts file'.format(hostname))
     else:
         with hide('running'):
             run("ssh-keygen -l -f /dev/stdin <<< '{0}'".format(ssh_key))
@@ -149,7 +149,7 @@ def connected_users():
         users = run('who | grep -v {0} || true'.format(username))
 
     if users:
-        print 'There are users connected to {0}:'.format(env.host_string)
+        print('There are users connected to {0}:'.format(env.host_string))
         for user in users.split("\n"):
-            print '  - {0}'.format(user.split(' ')[0])
-        print "\n"
+            print('  - {0}'.format(user.split(' ')[0]))
+        print("\n")
