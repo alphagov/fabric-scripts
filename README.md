@@ -8,12 +8,12 @@ server farm.
 
 The tool is intended to be configured and run on your local workstation/laptop. You should use `virtualenv` to create an isolated Python environment.
 
-Requires Python 2 to be installed - support for Python 3 is unknown.
+Requires Python 3, as per [.python-version](.python-version)
 
-To install `pip`, `virtualenv` and set up the environment:
+To install `pip3`, `virtualenv` and set up the environment:
 
-    $ sudo easy_install pip
-    $ sudo pip install virtualenv
+    $ sudo easy_install pip3
+    $ sudo pip3 install virtualenv
     $ mkdir ~/venv
     $ virtualenv ~/venv/fabric-scripts
 
@@ -26,11 +26,11 @@ To enable the virtual environment for this session (you will need to do this for
 
 To install the dependencies:
 
-    $ pip install -Ur requirements.txt
+    $ pip3 install -Ur requirements.txt
 
 NB: if you get a "pip: command not found" error, run this first:
 
-    $ sudo easy_install pip
+    $ sudo easy_install pip3
 
 Configure it (see [the fabric documentation][fabdoc] for more examples),
 
