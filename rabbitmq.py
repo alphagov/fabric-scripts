@@ -34,7 +34,7 @@ def cluster_is_ok():
     partitions = re.search(r'\{partitions,\[([^]]*)\]', status)
 
     if not known_nodes or not running_nodes or not partitions:
-        print("No matches found in output: %r" % status)
+        print(("No matches found in output: %r" % status))
         return False
 
     known_nodes = ','.join(sorted(known_nodes.group(1).split(',')))
@@ -42,12 +42,12 @@ def cluster_is_ok():
     partitions = partitions.group(1)
 
     if known_nodes != running_nodes:
-        print("Known nodes differ from running nodes: %r and %r" %
-              (known_nodes, running_nodes))
+        print(("Known nodes differ from running nodes: %r and %r" %
+              (known_nodes, running_nodes)))
         return False
 
     if partitions:
-        print("Cluster currently has a partition: %r" % partitions)
+        print(("Cluster currently has a partition: %r" % partitions))
         return False
 
     return True
