@@ -55,12 +55,12 @@ def check_database_upgrade():
     sudo("awk '$9==404 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-404s")
     sudo("awk '$9==302 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-302s")
 
-    print "Replaying Mapit 200s. Ensure that they are all still 200s."
-    print "NOTE: Some 404s may result if internal ids have changed because /area/<code> will redirect to /area/<internal-id> - this should be a low number and for /area/ urls only"
+    print("Replaying Mapit 200s. Ensure that they are all still 200s.")
+    print("NOTE: Some 404s may result if internal ids have changed because /area/<code> will redirect to /area/<internal-id> - this should be a low number and for /area/ urls only")
     run('while read line; do curl -sI $line | grep HTTP/1 ; done < mapit-200s | sort | uniq -c')
-    print "Replaying Mapit 404s. Ensure that they are all either 200s or 404s."
+    print("Replaying Mapit 404s. Ensure that they are all either 200s or 404s.")
     run('while read line; do curl -sI $line | grep HTTP/1 ; done < mapit-404s | sort | uniq -c')
-    print "Replaying Mapit 302s. Ensure that they are all still 302s. (these should be the /area/<code> redirects mentioned above)"
+    print("Replaying Mapit 302s. Ensure that they are all still 302s. (these should be the /area/<code> redirects mentioned above)")
     run('while read line; do curl -sI $line | grep HTTP/1 ; done < mapit-302s | sort | uniq -c')
 
     sudo('rm ~/mapit-200s ~/mapit-404s ~/mapit-302s')
