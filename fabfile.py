@@ -57,7 +57,7 @@ def fetch_hosts(options=''):
         else:
             hosts = local(command).splitlines()
 
-    return map(lambda host: host.split(".")[0], hosts)
+    return [host.split(".")[0] for host in hosts]
 
 
 def _check_repo_age():
@@ -234,5 +234,6 @@ def do(command):
 def sdo(command):
     """Execute arbitrary commands with sudo"""
     sudo(command)
+
 
 _check_repo_age()
