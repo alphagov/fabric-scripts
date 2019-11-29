@@ -1,4 +1,4 @@
-from urllib import quote_plus
+from urllib.parse import quote_plus
 import json
 
 from fabric.api import abort, env, hide, hosts, prompt, run, runs_once, sudo, task
@@ -59,17 +59,20 @@ def loadhosts(search_string=''):
 
     if search_string:
         url_safe_search_string = quote_plus(search_string)
-        url = 'https://alert.cluster/cgi-bin/icinga/status.cgi?search_string={0}&allunhandledproblems&jsonoutput'.format(url_safe_search_string)
+        url = 'https://alert.cluster/cgi-bin/icinga/status.cgi?search_string={0}&allunhandledproblems&jsonoutput'.format(
+            url_safe_search_string)
     else:
         url = prompt("Icinga URL (jsonformat): ")
 
     with hide('running', 'stdout'):
-        status_code = run('curl --silent --write-out "%{{http_code}}" --output /dev/null --insecure "{0}"'.format(url))
+        status_code = run(
+            'curl --silent --write-out "%{{http_code}}" --output /dev/null --insecure "{0}"'.format(url))
         if status_code == '200':
             resp = run('curl --insecure "{0}"'.format(url))
         elif status_code == '401':
             basic_auth_password = prompt('HTTP basic auth password: ')
-            resp = run('curl --user betademo:{1} --insecure "{0}"'.format(url, basic_auth_password))
+            resp = run(
+                'curl --user betademo:{1} --insecure "{0}"'.format(url, basic_auth_password))
         else:
             abort('Could not connect to monitoring service')
 
@@ -83,6 +86,6 @@ def loadhosts(search_string=''):
     if len(hosts) == 0:
         exit('No hosts were found with that search')
 
-    print "\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts)
+    print("\nSelected hosts:\n  - %s\n" % "\n  - ".join(hosts))
     prompt("Type 'yes' to confirm: ", validate="yes")
     env.hosts = hosts
