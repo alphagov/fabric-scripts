@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from fabric.api import settings, sudo, task
 
 
@@ -8,7 +6,8 @@ class HarvesterServiceStopped(Exception):
 
 
 def restart_harvester_process(type):
-    service_name = 'harvester_{type}_consumer-procfile-worker'.format(type=type)
+    service_name = 'harvester_{type}_consumer-procfile-worker'.format(
+        type=type)
     service_name_child = service_name + '_child'
 
     print('Checking status of:', service_name)
