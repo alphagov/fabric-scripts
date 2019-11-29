@@ -7,7 +7,8 @@ import re
 
 
 def _strip_bson(raw_output):
-    stripped = re.sub(r'(ISODate|ObjectId|NumberLong)\((.*?)\)', r'\2', raw_output)
+    stripped = re.sub(
+        r'(ISODate|ObjectId|NumberLong)\((.*?)\)', r'\2', raw_output)
     return re.sub(r'Timestamp\((.*?)\)', r'"\1"', stripped)
 
 
@@ -17,7 +18,7 @@ def _run_mongo_command(command):
     try:
         return json.loads(_strip_bson(response))
     except ValueError:
-        print response
+        print(response)
 
 
 def _i_am_primary(primary=None):
@@ -72,7 +73,8 @@ def find_primary():
     """Find which mongo node is the master"""
     with hide("everything"):
         if _i_am_primary():
-            print(colors.blue("%s is primary" % env["host_string"], bold=True))
+            print((colors.blue("%s is primary" %
+                               env["host_string"], bold=True)))
 
 
 @task
@@ -81,17 +83,17 @@ def status():
     """Check the status of the mongo cluster"""
     with hide("everything"):
         if _cluster_is_ok():
-            print(colors.blue("Cluster is OK", bold=True))
+            print((colors.blue("Cluster is OK", bold=True)))
             return
 
-        print(colors.blue("db.printReplicationInfo()", bold=True))
-        print(_run_mongo_command("db.printReplicationInfo()"))
+        print((colors.blue("db.printReplicationInfo()", bold=True)))
+        print((_run_mongo_command("db.printReplicationInfo()")))
 
-        print(colors.blue("db.printSlaveReplicationInfo()", bold=True))
-        print(_run_mongo_command("db.printSlaveReplicationInfo()"))
+        print((colors.blue("db.printSlaveReplicationInfo()", bold=True)))
+        print((_run_mongo_command("db.printSlaveReplicationInfo()")))
 
-        print(colors.blue("rs.status()", bold=True))
-        print(json.dumps(_run_mongo_command("rs.status()"), indent=4))
+        print((colors.blue("rs.status()", bold=True)))
+        print((json.dumps(_run_mongo_command("rs.status()"), indent=4)))
 
 
 @task
