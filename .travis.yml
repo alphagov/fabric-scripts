@@ -1,7 +1,7 @@
 ---
 language: "python"
 sudo: false # containerised builds
-python: 2.7
+python: 3.7.5
 install:
   - "pip install -q -r requirements_for_tests.txt"
   - "pip freeze"
