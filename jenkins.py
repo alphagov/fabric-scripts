@@ -10,13 +10,13 @@ def list_plugins():
 @task
 def list_plugin_versions():
     """List installed plugins with current version number"""
-    sudo("jenkins-cli list-plugins |awk '{ if ($NF ~ /\(.*\)/) print $1, $(NF-1); else print $1, $NF }'")
+    sudo(r"jenkins-cli list-plugins |awk '{ if ($NF ~ /\(.*\)/) print $1, $(NF-1); else print $1, $NF }'")
 
 
 @task
 def plugins_requiring_updates():
     """List plugins requiring an update"""
-    sudo("jenkins-cli |awk '{ if ($NF ~ /\(.*\)/) print $1 }'")
+    sudo(r"jenkins-cli |awk '{ if ($NF ~ /\(.*\)/) print $1 }'")
 
 
 @task
