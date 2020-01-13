@@ -6,10 +6,14 @@ import re
 import textwrap
 import time
 
-from fabric import state
-from fabric.api import (abort, env, hide, hosts, local, puts, run,
-                        runs_once, serial, settings, sudo, task, warn)
-from fabric.task_utils import crawl
+from fabric.tasks import task
+
+# from fabric import state
+# from fabric import (
+#     abort, env, hide, hosts, local, puts, run, runs_once, serial,
+#     settings, sudo, task, warn
+# )
+# from fabric.task_utils import crawl
 
 # Other submodules such as mapit depend on puppet, so include this one first
 import puppet
@@ -74,7 +78,7 @@ def _check_repo_age():
 
 
 @task
-def help(name=""):
+def help(context, name=""):
     """Show extended help for a task (e.g. 'fab help:search.reindex')"""
     from fabric.main import show_commands
     if not name:
@@ -89,7 +93,7 @@ def help(name=""):
 
 
 @task
-def production():
+def production(context):
     """Select production environment"""
     env['environment'] = 'production'
     env['aws_migration'] = False
@@ -97,7 +101,7 @@ def production():
 
 
 @task
-def staging():
+def staging(context):
     """Select staging environment"""
     env['environment'] = 'staging'
     env['aws_migration'] = False
@@ -105,7 +109,7 @@ def staging():
 
 
 @task
-def integration():
+def integration(context):
     """Select integration environment"""
     env['environment'] = 'integration'
     env['aws_migration'] = True
@@ -113,7 +117,7 @@ def integration():
 
 
 @task
-def training():
+def training(context):
     """Select training environment"""
     env['environment'] = 'training'
     env['aws_migration'] = True
@@ -153,7 +157,7 @@ def production_aws(stackname=None):
 
 
 @task
-def ci():
+def ci(context):
     """Select CI environment"""
     env['environment'] = 'ci'
     env['aws_migration'] = False
@@ -161,30 +165,27 @@ def ci():
 
 
 @task
-def all():
+def all(context):
     """Select all machines in current environment"""
     env.hosts.extend(fetch_hosts())
 
 
 @task(name='class')
-def klass(*class_names):
+def klass(context, *class_names):
     """Select a machine class"""
     for class_name in class_names:
         class_name = class_name.replace("-", "_")
         env.hosts.extend(fetch_hosts("-c %s" % class_name))
 
 
-@task
-@serial
-@hosts('localhost')
-def puppet_class(*class_names):
+@task(hosts='localhost')
+def puppet_class(context, *class_names):
     """Select all machines which include a given puppet class"""
     for class_name in class_names:
         env.hosts.extend(fetch_hosts("-C %s" % class_name))
 
 
 @task
-@runs_once
 def application(app_name):
     """Select all machines which host a given application"""
     class_name = 'govuk::apps::{}'.format(app_name.replace('-', '_'))
@@ -198,10 +199,8 @@ def node_type(node_name):
     puppet_class(class_name)
 
 
-@task
-@runs_once
-@hosts(["localhost"])
-def classes():
+@task(hosts=["localhost"])
+def classes(context):
     """List available classes"""
     with hide("everything"):
         if not env["aws_migration"]:
@@ -216,8 +215,7 @@ def classes():
 
 
 @task
-@runs_once
-def hosts():
+def hosts(context):
     """List selected hosts"""
     me = state.commands['hosts']
     hosts = me.get_hosts(None, None, None, env)

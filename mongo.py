@@ -1,10 +1,8 @@
-from fabric.api import task, runs_once
-from fabric.api import run, sudo, hide, settings, abort, execute, puts, env
-from fabric import colors
 from time import sleep
 import json
 import re
 
+from fabric.tasks import task
 
 def _strip_bson(raw_output):
     stripped = re.sub(
@@ -25,7 +23,7 @@ def _i_am_primary(primary=None):
     return _run_mongo_command("rs.isMaster()")["ismaster"]
 
 
-def _wait_for_ok():
+def _wait_for_ok(context):
     while True:
         if _cluster_is_ok():
             return
@@ -33,7 +31,7 @@ def _wait_for_ok():
         print("Waiting for cluster to be okay")
 
 
-def _cluster_is_ok():
+def _cluster_is_ok(context):
     member_statuses = _run_mongo_command("rs.status()")["members"]
     health_ok = all(s['health'] == 1 for s in member_statuses)
 
@@ -47,7 +45,7 @@ def _cluster_is_ok():
 
 
 @task
-def force_resync():
+def force_resync(context):
     """Force a mongo secondary to resync by removing all its data."""
     if len(env.hosts) > 1:
         abort("This task should only be run on one host at a time")
@@ -69,7 +67,7 @@ def force_resync():
 
 
 @task
-def find_primary():
+def find_primary(context):
     """Find which mongo node is the master"""
     with hide("everything"):
         if _i_am_primary():
@@ -78,8 +76,7 @@ def find_primary():
 
 
 @task
-@runs_once
-def status():
+def status(context):
     """Check the status of the mongo cluster"""
     with hide("everything"):
         if _cluster_is_ok():
@@ -114,7 +111,7 @@ def step_down_primary(seconds='100'):
 
 
 @task
-def safe_reboot():
+def safe_reboot(context):
     """Reboot a mongo machine, stepping down if it is the primary"""
     import vm
     if not vm.reboot_required():

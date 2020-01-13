@@ -1,36 +1,35 @@
-from fabric.api import env, execute, hide, hosts, parallel, run, sudo, task
-from fabric.utils import error
 import re
-
 import nagios
+
+from fabric.tasks import task
 
 
 @task
-def uptime():
+def uptime(context):
     """Show uptime and load"""
     run('uptime')
 
 
 @task
-def free():
+def free(context):
     """Show memory stats"""
     run('free')
 
 
 @task
-def top_mem_proc():
+def top_mem_proc(context):
     """Show top processes by memory usage"""
     run('ps aux |sort -rk4 |head')
 
 
 @task
-def disk():
+def disk(context):
     """Show disk usage"""
     run('df -kh')
 
 
 @task
-def os_version():
+def os_version(context):
     """Show operating system"""
     run('facter lsbdistcodename lsbdistdescription operatingsystem operatingsystemrelease')
 
@@ -51,7 +50,7 @@ def deprecated_library(name):
 
 
 @task
-def stopped_jobs():
+def stopped_jobs(context):
     """Find stopped govuk application jobs"""
     with hide('running'):
         run('grep -l govuk_spinup /etc/init/*.conf | xargs -n1 basename | while read line; do sudo status "${line%%.conf}"; done | grep stop || :')
@@ -77,7 +76,7 @@ def reload_unicorn(name):
     error("task deprecated by 'app.reload'")
 
 
-def reboot_required():
+def reboot_required(context):
     """
     Check whether a reboot is required
 
@@ -87,7 +86,7 @@ def reboot_required():
 
 
 @task
-def reboot():
+def reboot(context):
     """Schedule a host for downtime in nagios and reboot (if required)
 
     Usage:
@@ -100,14 +99,14 @@ def reboot():
 
 
 @task
-def force_reboot():
+def force_reboot(context):
     """Schedule a host for downtime in nagios and force reboot (even if not required)"""
     execute(nagios.schedule_downtime, env['host_string'])
     run("sudo shutdown -r now")
 
 
 @task
-def poweroff():
+def poweroff(context):
     """Schedule a host for downtime in nagios and shutdown the VM
 
     Usage:
@@ -117,8 +116,7 @@ def poweroff():
     run("sudo poweroff")
 
 
-@task
-@hosts('puppetmaster-1.management')
+@task(hosts='puppetmaster-1.management')
 def host_key(hostname):
     """
     Check the SSH host key of a machine. This task runs on the Puppetmaster because
@@ -138,8 +136,7 @@ def host_key(hostname):
 
 
 @task
-@parallel(pool_size=5)
-def connected_users():
+def connected_users(context):
     """
     Output a list of users who are logged in to a machine
     """

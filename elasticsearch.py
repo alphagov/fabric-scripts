@@ -1,5 +1,5 @@
-from fabric.api import abort, run, task
 import re
+from fabric.tasks import task
 
 ELASTICSEARCH_HOST = 'http://elasticsearch6:80'
 

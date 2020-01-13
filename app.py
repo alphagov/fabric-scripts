@@ -1,6 +1,5 @@
 import re
-
-from fabric.api import abort, sudo, task, run
+from fabric.tasks import task
 
 
 @task

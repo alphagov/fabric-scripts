@@ -1,13 +1,11 @@
-from fabric.api import task, sudo, env, run, cd
-from fabric.tasks import execute
-
 import app
 import nginx
 import puppet
 
+from fabric.tasks import task
 
 @task
-def update_database_via_app():
+def update_database_via_app(context):
     """Update a Mapit database from a new database dump using scripts in the app (new mapit-*.api servers)"""
 
     if len(env.hosts) > 1:
@@ -25,7 +23,7 @@ def update_database_via_app():
     _restart_mapit_services()
 
 
-def _stop_mapit_services():
+def _stop_mapit_services(context):
     # Stop puppet so that any scheduled runs don't happen while we are doing
     # our work
     execute(puppet.disable, 'Updating mapit database which requires stopping some services we would not want a scheduled puppet run to restart before we were done')
@@ -38,7 +36,7 @@ def _stop_mapit_services():
     sudo('service memcached restart')
 
 
-def _restart_mapit_services():
+def _restart_mapit_services(context):
     # Restart services in reverse order so that nginx comes up last - we don't
     # want to start sending traffic to the app before the app itself is running
     sudo('service collectd start')
@@ -48,7 +46,7 @@ def _restart_mapit_services():
 
 
 @task
-def check_database_upgrade():
+def check_database_upgrade(context):
     """Replay yesterday's Mapit requests to ensure that a database upgrade works"""
 
     sudo("awk '$9==200 {print \"http://localhost:3108\" $7}' /var/log/nginx/mapit.publishing.service.gov.uk-access.log.1 | sort | uniq > mapit-200s")

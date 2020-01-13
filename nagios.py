@@ -1,8 +1,7 @@
 from urllib.parse import quote_plus
 import json
 
-from fabric.api import abort, env, hide, hosts, prompt, run, runs_once, sudo, task
-
+from fabric.tasks import task
 
 NAGIOS_CMD_FILE = '/var/lib/icinga/rw/nagios.cmd'
 
@@ -20,8 +19,7 @@ def _monitoring_hostname(host):
         return "{0}.{1}.publishing.service.gov.uk".format(host, env['environment'])
 
 
-@task
-@hosts(['alert.cluster'])
+@task(hosts=['alert.cluster'])
 def schedule_downtime(host, minutes='20'):
     """Schedules downtime for a host in nagios; default for 20 minutes"""
 
@@ -46,9 +44,7 @@ def schedule_downtime(host, minutes='20'):
     submit_nagios_cmd(comment)
 
 
-@task
-@runs_once
-@hosts(['alert.cluster'])
+@task(hosts=['alert.cluster'])
 def loadhosts(search_string=''):
     """Load hosts from an Icinga URL in jsonformat.
 

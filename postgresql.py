@@ -1,4 +1,4 @@
-from fabric.api import task, settings, run
+from fabric.tasks import task
 
 
 @task
@@ -17,5 +17,5 @@ def sync(database, dest_machine):
 
 
 @task
-def push_s3_backup():
+def push_s3_backup(context):
     run('sudo -iu postgres /usr/local/bin/wal-e_postgres_base_backup_push')

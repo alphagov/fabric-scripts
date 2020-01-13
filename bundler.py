@@ -1,7 +1,7 @@
 from os.path import join
-from fabric.api import sudo, task
-from fabric.utils import error
-import fabric.contrib.files
+from fabric.tasks import task
+# from fabric.utils import error
+# import fabric.contrib.files
 
 import puppet
 
@@ -13,7 +13,7 @@ config_file_locations = [
 config_file_suffix = '.bundle/config'
 
 
-def get_bundler_config():
+def get_bundler_config(context):
     for prefix in config_file_locations:
         location = join(prefix, config_file_suffix)
         if fabric.contrib.files.exists(location, use_sudo=True):
@@ -23,7 +23,7 @@ def get_bundler_config():
 
 
 @task
-def failover_to_rubygems():
+def failover_to_rubygems(context):
     """Change bundler to use rubygems.org for gems rather than gemstash"""
     bundler_config = get_bundler_config()
     puppet.disable('Fabric failover_to_rubygems invoked')
@@ -35,7 +35,7 @@ def failover_to_rubygems():
 
 
 @task
-def revert_mirror():
+def revert_mirror(context):
     puppet.enable()
     puppet.agent()
     get_bundler_config()

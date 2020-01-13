@@ -1,12 +1,11 @@
-from fabric.api import abort, run, sudo, task
-import fabric.contrib.files
 import puppet
+from fabric.tasks import task
 
 maintenance_config = '/etc/nginx/includes/maintenance.conf'
 
 
 @task
-def enable_maintenance():
+def enable_maintenance(context):
     """Enables a maintenance page and serves a 503"""
     """Only to be run on loadbalancers"""
     if not fabric.contrib.files.exists(maintenance_config):
@@ -17,7 +16,7 @@ def enable_maintenance():
 
 
 @task
-def disable_maintenance():
+def disable_maintenance(context):
     """Disables a maintenance page"""
     """Only to be run on loadbalancers"""
     if not fabric.contrib.files.exists(maintenance_config):
@@ -28,12 +27,13 @@ def disable_maintenance():
 
 
 @task
-def configtest():
+def configtest(context):
     """Tests the Nginx configuration"""
     sudo('service nginx configtest')
 
 
-def gracefulstop(wait=True):
+@task
+def gracefulstop(context, wait=True):
     """Gracefully shutdown Nginx by finishing any in-flight requests"""
     sudo('nginx -s quit')
 
@@ -43,7 +43,7 @@ def gracefulstop(wait=True):
 
 
 @task
-def gracefulrestart(force=False):
+def gracefulrestart(context, force=False):
     """Gracefully shutdown and start Nginx (not reload)"""
     if not force:
         configtest()
@@ -52,19 +52,19 @@ def gracefulrestart(force=False):
 
 
 @task
-def kill():
+def kill(context):
     """Shut down Nginx immediately without waiting for it to finish running"""
     sudo('service nginx stop')
 
 
 @task
-def start():
+def start(context):
     """Start up Nginx on a machine"""
     sudo('service nginx start')
 
 
 @task
-def force_restart():
+def force_restart(context):
     """Turns Nginx off and on again"""
     kill()
     start()

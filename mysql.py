@@ -1,6 +1,4 @@
-from fabric.api import abort, env, hide, run, settings, task
-from fabric.operations import prompt
-
+from fabric.tasks import task
 
 def run_mysql_command(cmd):
     run('sudo -i mysql -e "{}"'.format(cmd))
@@ -11,17 +9,17 @@ def switch_slow_query_log(value):
 
 
 @task
-def stop_slow_query_log(*args):
+def stop_slow_query_log(context, *args):
     switch_slow_query_log('OFF')
 
 
 @task
-def start_slow_query_log(*args):
+def start_slow_query_log(context, *args):
     switch_slow_query_log('ON')
 
 
 @task
-def fix_replication_from_slow_query_log_after_upgrade():
+def fix_replication_from_slow_query_log_after_upgrade(context):
     """
     Used to fix issues seen when upgrading mysql
 
@@ -39,7 +37,7 @@ def fix_replication_from_slow_query_log_after_upgrade():
 
 
 @task
-def setup_slave_from_master(master):
+def setup_slave_from_master(context, master):
     """
     Sets up a slave from a master by:
       - configuring MySQL replication config
@@ -62,7 +60,7 @@ def setup_slave_from_master(master):
 
 
 @task
-def replicate_slave_from_master(master):
+def replicate_slave_from_master(context, master):
     """
     Updates a slave from a master by taking a dump from the master,
     copying it to the slave and then restoring the dump.
@@ -101,7 +99,7 @@ def replicate_slave_from_master(master):
 
 
 @task
-def reset_slave():
+def reset_slave(context):
     """
     Used to reset a slave if MySQL replication is failing
 
@@ -142,7 +140,7 @@ def reset_slave():
 
 
 @task
-def slave_status():
+def slave_status(context):
     """
     Show status of MySQL replication on slave; must be run against the slave host
     """

@@ -1,8 +1,8 @@
-from fabric.api import sudo, task
+from fabric.tasks import task
 
 
 @task
-def ban_all():
+def ban_all(context):
     """
     Invalidate all current cached objects in varnish.
 
@@ -16,7 +16,7 @@ def ban_all():
 
 
 @task
-def restart():
+def restart(context):
     """
     Restart Varnish caches
     """
@@ -24,6 +24,6 @@ def restart():
 
 
 @task(default=True)
-def stats():
+def stats(context):
     "Show details about varnish performance"
     sudo('varnishstat -1')

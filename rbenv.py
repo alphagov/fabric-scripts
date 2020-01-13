@@ -1,6 +1,4 @@
-from fabric.api import run, sudo, task, hide
-from fabric.contrib.files import exists
-
+from fabric.tasks import task
 
 @task
 def version_in_use(version):

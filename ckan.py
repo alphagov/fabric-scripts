@@ -1,4 +1,4 @@
-from fabric.api import settings, sudo, task
+from fabric.tasks import task
 
 
 class HarvesterServiceStopped(Exception):
@@ -23,21 +23,21 @@ def restart_harvester_process(type):
 
 
 @task
-def restart_harvester_gather():
+def restart_harvester_gather(context):
     """Restart gather harvester process."""
 
     restart_harvester_process('gather')
 
 
 @task
-def restart_harvester_fetch():
+def restart_harvester_fetch(context):
     """Restart fetch harvester process."""
 
     restart_harvester_process('fetch')
 
 
 @task
-def restart_harvester():
+def restart_harvester(context):
     """Restart harvester process."""
 
     restart_harvester_gather()
