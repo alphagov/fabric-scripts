@@ -27,6 +27,12 @@ def disable_maintenance():
     puppet.enable()
 
 
+@task
+def configtest():
+    """Tests the Nginx configuration"""
+    sudo('service nginx configtest')
+
+
 def gracefulstop(wait=True):
     """Gracefully shutdown Nginx by finishing any in-flight requests"""
     sudo('nginx -s quit')
@@ -37,8 +43,10 @@ def gracefulstop(wait=True):
 
 
 @task
-def gracefulrestart():
+def gracefulrestart(force=False):
     """Gracefully shutdown and start Nginx (not reload)"""
+    if not force:
+        configtest()
     gracefulstop()
     start()
 
