@@ -39,7 +39,6 @@ import rabbitmq
 import rbenv
 import statsd
 import vm
-import whitehall
 
 HERE = os.path.dirname(__file__)
 SSH_DIR = os.path.join(HERE, '.ssh')
