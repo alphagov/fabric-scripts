@@ -3,27 +3,6 @@ import util
 
 
 @task
-def dedupe_stats_announcement_from_file(filename):
-    """De-duplicate Whitehall statistics accouncements from a CSV file"""
-    with open(filename) as fd:
-        duplicates = [line.strip().split(',') for line in fd]
-        for duplicate_slug, authoritative_slug in duplicates:
-            execute(
-                dedupe_stats_announcement, duplicate_slug, authoritative_slug)
-
-
-@task
-@runs_once
-def dedupe_stats_announcement(duplicate_slug, authoritative_slug, noop=False):
-    """De-duplicate Whitehall statistics announcement"""
-    option = ' -n' if noop else ''
-    command = './script/dedupe_stats_announcement{} {} {}'.format(
-        option, duplicate_slug, authoritative_slug)
-
-    util.bundle_exec('whitehall', command)
-
-
-@task
 @runs_once
 def overdue_scheduled_publications():
     """List overdue scheduled publications"""
