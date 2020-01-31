@@ -1,15 +1,13 @@
 from __future__ import print_function
 
-from collections import defaultdict
 from git import Repo
-from hashlib import md5
 import os
 import re
 import textwrap
 import time
 
 from fabric import state
-from fabric.api import (abort, env, get, hide, hosts, local, puts, run,
+from fabric.api import (abort, env, hide, hosts, local, puts, run,
                         runs_once, serial, settings, sudo, task, warn)
 from fabric.task_utils import crawl
 
@@ -41,7 +39,6 @@ import statsd
 import vm
 
 HERE = os.path.dirname(__file__)
-SSH_DIR = os.path.join(HERE, '.ssh')
 
 # When to warn that you haven't pulled the repo recently.
 REPO_OUTDATED_TIME = 3600 * 24 * 5
