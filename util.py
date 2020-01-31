@@ -1,39 +1,6 @@
-import random
 import re
 
-from fabric.api import env, cd, sudo
-
-
-def use_random_host(role):
-    """Use a randomly chosen host from the given role"""
-    hosts = env.roledefs[role]()
-    env.host_string = random.choice(hosts)
-
-
-def rake(app, task, *args, **params):
-    """Run a rake task for the specified application
-
-    If given positional arguments, converts them to rake's square bracket
-    syntax (ie, rake foo[arg1,arg2,...])
-
-    If given named arguments, converts them to environment variables (ie.
-    KEY1=val1 KEY2=val2 rake foo)
-    """
-    if args:
-        _validate_strings("rake variable",
-                          args, bad_chars=",]'")
-        task = "{}[{}]".format(task, ','.join(args))
-
-    bundle_exec(app, "rake " + task, **params)
-
-
-def bundle_exec(app, cmd, **params):
-    """Run any command through bundle exec for the specified application
-
-    If given named arguments, converts them to environment variables (ie.
-    KEY1=val1 KEY2=val2 command)
-    """
-    command(app, "bundle exec {}".format(cmd), **params)
+from fabric.api import cd, sudo
 
 
 def command(app, cmd, **params):
