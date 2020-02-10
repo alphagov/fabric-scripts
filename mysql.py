@@ -73,9 +73,10 @@ def replicate_slave_from_master(master):
         exit('This job is currently only setup to run against one slave at a time')
 
     with settings(host_string=master):
-        # The use of `--master-data` here implies `--lock-all-tables` per the
-        # MySQL reference manual: http://dev.mysql.com/doc/refman/5.1/en/mysqldump.html#option_mysqldump_master-data
-        run('sudo -i mysqldump -u root --all-databases --master-data --add-drop-database > dump.sql')
+        # `--single-transaction` in conjunction with `--master-data` avoids
+        # locking tables for any significant length of time. See
+        # https://web.archive.org/web/20160308163516/https://dev.mysql.com/doc/refman/5.5/en/mysqldump.html#option_mysqldump_single-transaction
+        run('sudo -i mysqldump -u root --all-databases --master-data --single-transaction --quick --add-drop-database > dump.sql')
 
     with settings(host_string=master, forward_agent=True):
         run('scp dump.sql {0}:~'.format(env.hosts[0]))
