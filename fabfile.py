@@ -36,6 +36,7 @@ import postgresql
 import rabbitmq
 import rbenv
 import vm
+import publisher_maintenance
 
 HERE = os.path.dirname(__file__)
 
@@ -233,5 +234,6 @@ def do(command):
 def sdo(command):
     """Execute arbitrary commands with sudo"""
     sudo(command)
+
 
 _check_repo_age()
