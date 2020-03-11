@@ -35,7 +35,6 @@ import ntp
 import postgresql
 import rabbitmq
 import rbenv
-import statsd
 import vm
 
 HERE = os.path.dirname(__file__)
