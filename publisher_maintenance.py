@@ -20,6 +20,8 @@ valid_apps = set([
     "travel-advice-publisher",
 ])
 
+maintenance_setting = 'set $maintenance 1'
+
 
 @task
 def enable_maintenance(*app_list):
@@ -27,7 +29,7 @@ def enable_maintenance(*app_list):
     """Only to be run on loadbalancers"""
     if not fabric.contrib.files.exists(maintenance_config):
         abort("Sorry this task can only currently be run on loadbalancers")
-    # puppet.disable("Maintenance mode enabled")
+    puppet.disable("Maintenance mode enabled")
     env_url_post = fabric.state.env.gateway.lstrip("jumpbox.")
     app_list = list(app_list)
     if not valid_apps.issuperset(app_list):
@@ -37,10 +39,12 @@ def enable_maintenance(*app_list):
     for app in app_list:
         app_hostname = "{}.{}".format(app, env_url_post)
         app_config_file = "/etc/nginx/sites-enabled/{}".format(app_hostname)
+        if app == "content-publisher":
+            maintenance_setting = "limit_except GET { deny all; }"
         fabric.contrib.files.sed(
             app_config_file,
             "include includes/maintenance.conf",
-            "set $maintenance 1",
+            maintenance_setting,
             use_sudo=True,
             backup=".maint-bak"
         )
