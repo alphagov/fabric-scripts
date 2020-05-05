@@ -1,0 +1,15 @@
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 2.7
+
+      - run: pip install -qr requirements_for_tests.txt
+      - run: pip freeze
+      - run: make test
