@@ -39,10 +39,7 @@ def enable_maintenance(*app_list):
     for app in app_list:
         app_hostname = "{}.{}".format(app, env_url_post)
         app_config_file = "/etc/nginx/sites-enabled/{}".format(app_hostname)
-        if app == "content-publisher":
-            maintenance_setting = "limit_except GET { deny all; }"
-        else:
-            maintenance_setting = "set $maintenance 1;"
+        maintenance_setting = "set $maintenance 1;"
         fabric.contrib.files.sed(
             app_config_file,
             "include includes/maintenance.conf;",
