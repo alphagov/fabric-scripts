@@ -103,6 +103,13 @@ def staging():
     env['aws_migration'] = False
     env.gateway = 'jumpbox.staging.publishing.service.gov.uk'
 
+@task
+def test():
+    """Select test environment"""
+    env['environment'] = 'test'
+    env['aws_migration'] = True
+    env.gateway = 'jumpbox.pink.test.govuk.digital'
+
 
 @task
 def integration():
