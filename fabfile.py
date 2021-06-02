@@ -26,7 +26,6 @@ import incident
 import jenkins
 import locksmith
 import logstream
-import mapit
 import mongo
 import mysql
 import nagios
