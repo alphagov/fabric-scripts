@@ -1,3 +1,8 @@
+# DEPRECATED
+
+This repository is no longer maintained.
+These scripts should not be used to administer GOV.UK servers.
+
 # GOV.UK Fabric Scripts
 
 [Fabric](http://fabfile.org) is a command-line tool for application deployment
